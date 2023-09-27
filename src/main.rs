@@ -5,6 +5,7 @@ use bevy::{
     window::{PresentMode, WindowLevel, WindowMode},
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use game::GamePlugins;
 
 fn main() {
     App::new()
@@ -24,6 +25,7 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()),
             WorldInspectorPlugin::new(),
+            GamePlugins
         ))
         .run();
 }
