@@ -1,65 +1,21 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
+use noise::utils::NoiseMap;
 
-use super::constants::{CHUNK_SIZE, CHUNK_Z_POS, TILE_SIZE};
+use crate::game::world::helpers::{ChunkPos, IntoTranslation, SetZToChunkZ};
 
-pub trait IntoChunkPos {
-    fn to_chunk_pos(self) -> ChunkPos;
-}
+use super::{constants::{CHUNK_SIZE, TILE_SIZE}, components::Chunk};
 
-pub trait IntoTranslation {
-    fn to_translation(self) -> Vec3;
-}
+#[repr(transparent)]
+pub struct HeightNoiseMap(pub NoiseMap);
 
-pub trait SetZToChunkZ<T> {
-    fn set_z_to_chunk_z(self) -> T;
-}
+#[repr(transparent)]
+pub struct TemperatureNoiseMap(pub NoiseMap);
 
-#[derive(PartialEq, PartialOrd, Clone, Copy, Debug)]
-pub struct WorldPos {
-    pub x: f32,
-    pub y: f32,
-}
+#[repr(transparent)]
+pub struct PrecipitationNoiseMap(pub NoiseMap);
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Debug)]
-pub struct ChunkPos {
-    pub x: i32,
-    pub y: i32,
-}
-
-impl SetZToChunkZ<Vec3> for Vec3 {
-    fn set_z_to_chunk_z(self) -> Vec3 {
-        Vec3 {
-            x: self.x,
-            y: self.y,
-            z: CHUNK_Z_POS,
-        }
-    }
-}
-
-impl IntoTranslation for ChunkPos {
-    fn to_translation(self) -> Vec3 {
-        Vec3 {
-            x: self.x as f32 * CHUNK_SIZE as f32 * TILE_SIZE,
-            y: self.y as f32 * CHUNK_SIZE as f32 * TILE_SIZE,
-            z: 0.0,
-        }
-    }
-}
-
-impl IntoChunkPos for Vec2 {
-    fn to_chunk_pos(self) -> ChunkPos {
-        let pos = self.as_ivec2();
-        let chunk_size = IVec2::new(CHUNK_SIZE as i32, CHUNK_SIZE as i32);
-        let tile_size = IVec2::new(TILE_SIZE as i32, TILE_SIZE as i32);
-        let chunk_pos = pos / (chunk_size * tile_size);
-        ChunkPos {
-            x: chunk_pos.x,
-            y: chunk_pos.x,
-        }
-    }
-}
-
+// Creates the tilemap that the chunk uses
 pub fn create_chunk_tilemap(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
@@ -90,9 +46,15 @@ pub fn create_chunk_tilemap(
         }
     }
 
-    let chunk_translation = chunk_pos.to_translation().set_z_to_chunk_z();
-    let chunk_transform = Transform::from_translation(chunk_translation);
+    // Place the chunk at the center rather than from the bottom left
+    let chunk_translation = chunk_pos.to_translation().set_z_to_chunk_z()
+        - Vec3 {
+            x: (CHUNK_SIZE as f32 * TILE_SIZE) / 2.0f32,
+            y: (CHUNK_SIZE as f32 * TILE_SIZE) / 2.0f32,
+            z: 0.0f32,
+        };
 
+    let chunk_transform = Transform::from_translation(chunk_translation);
     let tile_size = TilemapTileSize {
         x: TILE_SIZE,
         y: TILE_SIZE,
@@ -118,6 +80,7 @@ pub fn create_chunk_tilemap(
                 transform: chunk_transform,
                 ..Default::default()
             },
+            Chunk
         ))
         .id()
 }
