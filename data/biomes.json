@@ -1,0 +1,10 @@
+[
+    {
+        "id": "biome:grassland",
+        "texture_location": "assets/tilemaps/grassland.png"
+    },
+    {
+        "id": "biome:snowy_tundra",
+        "texture_location": "assets/tilemaps/snowy_tundra.png"
+    }
+]

@@ -50,11 +50,13 @@ pub fn create_texture_map(
 ) -> TextureMap {
     let mut texture_map = TextureMap::new((CHUNK_SIZE as usize, CHUNK_SIZE as usize));
 
+    // Determines what tiles to put at certain co-ordinates
     for x in 0..CHUNK_SIZE as usize {
         for y in 0..CHUNK_SIZE as usize {
             let height = height_noise_map.0.get_value(x, y);
             let precipiation = precipiation_noise_map.0.get_value(x, y);
-            if height < WATER_HEIGHT_THRESHOLD && precipiation < WATER_PRECIPITATION_THRESHOLD {
+
+            if is_water_tile(height, precipiation) {
                 texture_map.set_value(x, y, 0);
                 continue;
             }
@@ -64,4 +66,8 @@ pub fn create_texture_map(
     }
 
     texture_map
+}
+
+pub fn is_water_tile(height: f64, precipiation: f64) -> bool {
+    height < WATER_HEIGHT_THRESHOLD && precipiation > WATER_PRECIPITATION_THRESHOLD
 }
