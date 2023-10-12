@@ -1,5 +1,5 @@
-pub const PACKED_TEXTURE_PATH: &'static str = "assets/tilemaps/packed_tilemap.png";
-pub const ASSET_PACKED_TEXTURE_PATH: &'static str = "tilemaps/packed_tilemap.png";
+pub const TEXTURE_ATLAS_PATH: &'static str = "assets/tilemaps/packed_tilemap.png";
+pub const ASSET_TEXTURE_ATLAS_PATH: &'static str = "tilemaps/packed_tilemap.png";
 pub const NEIGHBOURS_TO_CHECK: [(i8, i8); 4] = [
     (-1, 0), // Left
     (1, 0),  // Right

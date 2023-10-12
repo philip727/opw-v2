@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use noise::utils::NoiseMap;
 
-use crate::game::world::helpers::{ChunkPos, IntoTranslation, SetZToChunkZ};
+use crate::game::world::{helpers::{ChunkPos, IntoTranslation, SetZToChunkZ}, textures::constants::ASSET_TEXTURE_ATLAS_PATH};
 
 use super::{constants::{CHUNK_SIZE, TILE_SIZE}, components::Chunk};
 
@@ -63,7 +63,7 @@ pub fn create_chunk_tilemap(
     let grid_size: TilemapGridSize = tile_size.into();
     let map_type = TilemapType::Square;
 
-    let texture_handle: Handle<Image> = asset_server.load("tilemaps/temp.png");
+    let texture_handle: Handle<Image> = asset_server.load(ASSET_TEXTURE_ATLAS_PATH);
     let tilemap_texture = TilemapTexture::Single(texture_handle);
 
     commands

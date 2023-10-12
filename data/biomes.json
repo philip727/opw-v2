@@ -5,6 +5,22 @@
         "rules": {
             "precipitation": 0.57,
             "temperature": 0.51
+        },
+        "tiles": {
+            "water": 13,
+            "top_left": 0,
+            "top_middle": 1,
+            "top_right": 2,
+            "middle": 3,
+            "middle_left": 4,
+            "middle_right": 5,
+            "down_right": 6,
+            "down_left": 7,
+            "up_right": 8,
+            "up_left": 9,
+            "bottom_left": 10,
+            "bottom_middle": 11,
+            "bottom_right": 12
         }
     },
     {
@@ -13,6 +29,22 @@
         "rules": {
             "precipitation": 0.87,
             "temperature": 0.05
+        },
+        "tiles": {
+            "water": 13,
+            "top_left": 0,
+            "top_middle": 1,
+            "top_right": 2,
+            "middle": 3,
+            "middle_left": 4,
+            "middle_right": 5,
+            "down_right": 6,
+            "down_left": 7,
+            "up_right": 8,
+            "up_left": 9,
+            "bottom_left": 10,
+            "bottom_middle": 11,
+            "bottom_right": 12
         }
     }
 ]

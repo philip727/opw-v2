@@ -12,6 +12,7 @@ pub mod biomes;
 pub mod systems;
 pub mod constants;
 pub mod states;
+pub mod ruletile;
 
 pub struct WorldPlugins;
 

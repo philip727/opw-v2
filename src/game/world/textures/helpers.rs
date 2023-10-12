@@ -2,14 +2,18 @@ use image::{io::Reader as ImageReader, GenericImageView, ImageBuffer};
 
 use crate::{
     game::world::{
-        biomes::helpers::BiomeData,
+        biomes::{
+            helpers::{determine_best_biome, BiomeData},
+            resources::BiomeManager,
+        },
         generation::{
             constants::{
                 CHUNK_SIZE, TILE_SIZE, WATER_HEIGHT_THRESHOLD, WATER_PRECIPITATION_THRESHOLD,
             },
             helpers::*,
         },
-        textures::constants::PACKED_TEXTURE_PATH,
+        ruletile::helpers::{RuleTile, RuletileMap},
+        textures::constants::TEXTURE_ATLAS_PATH,
     },
     math::map::ValueMap2D,
 };
@@ -54,6 +58,37 @@ pub struct TextureMap {
     points: Vec<u32>,
 }
 
+impl TextureMap {
+    pub fn generate(
+        height_map: &HeightMap,
+        temperature_noise_map: &TemperatureNoiseMap,
+        precipitation_noise_map: &PrecipitationNoiseMap,
+        ruletile_map: &RuletileMap,
+        biome_manager: &BiomeManager,
+    ) -> TextureMap {
+        let mut texture_map = TextureMap::new((CHUNK_SIZE as usize, CHUNK_SIZE as usize));
+        for x in 0..CHUNK_SIZE as usize {
+            for y in 0..CHUNK_SIZE as usize {
+                let height = height_map.get_value(x, y).unwrap();
+                let precipitation = precipitation_noise_map.0.get_value(x, y) as f32;
+                let temperature = temperature_noise_map.0.get_value(x, y) as f32;
+                let ruletile = ruletile_map.get_value(x, y).unwrap_or(RuleTile::Water);
+
+                let biome = determine_best_biome(precipitation, temperature, biome_manager);
+                let tile_offset = biome_manager.get_biome_offset(biome).unwrap();
+
+                texture_map.set_value(
+                    x,
+                    y,
+                    tile_offset + ruletile.get_texture_offset(&biome) as u32,
+                );
+            }
+        }
+
+        texture_map
+    }
+}
+
 impl ValueMap2D<u32> for TextureMap {
     fn new(size: (usize, usize)) -> Self {
         let (width, height) = size;
@@ -82,8 +117,8 @@ impl ValueMap2D<u32> for TextureMap {
 impl HeightMap {
     // Creates a height map for us to determine textures
     pub fn generate(
-        height_noise_map: HeightNoiseMap,
-        precipitation_noise_map: PrecipitationNoiseMap,
+        height_noise_map: &HeightNoiseMap,
+        precipitation_noise_map: &PrecipitationNoiseMap,
     ) -> HeightMap {
         let mut height_map = HeightMap::new((CHUNK_SIZE as usize, CHUNK_SIZE as usize));
         // Determines what tiles to put at certain co-ordinates
@@ -101,24 +136,19 @@ impl HeightMap {
             }
         }
 
-        // Determine Biome Textures
-        // for x in 0..CHUNK_SIZE as usize {
-        //     for y in 0..CHUNK_SIZE as usize {
-        //         let height = height_noise_map.0.get_value(x, y) as f32;
-        //         let precipitation = precipitation_noise_map.0.get_value(x, y) as f32;
-        //         let temperature = temperature_noise_map.0.get_value(x, y) as f32;
-
-        //         let biome = determine_best_biome(precipitation, temperature, biome_manager);
-        //         biome_manager.get_biome_offset(biome);
-        //     }
-        // }
-
         height_map
     }
+
+    // Smooths the height map to show only
     pub fn smoothen_height_map(&mut self, iterations: Option<u32>) {
         let (width, height) = self.get_size();
 
-        for _ in 0..iterations.unwrap_or(1) {
+        // Checks if nothing was passed in or the iterations is an invalid value
+        let iterations = iterations.unwrap_or(1);
+        let iterations = if iterations < 1 { 1 } else { iterations };
+
+        // More iterations = Less likely of a single tile, however it hinders CPU performance
+        for _ in 0..iterations {
             for x in 0..width {
                 for y in 0..height {
                     let current_texture = self.get_value(x, y).unwrap();
@@ -176,7 +206,7 @@ pub fn generate_texture_atlas(biome_data: &Vec<BiomeData>) {
 
     let packed_map = create_texture_atlas(IMAGE_WIDTH, image_height, tile_size_u32, &biome_data);
     packed_map
-        .save(PACKED_TEXTURE_PATH)
+        .save(TEXTURE_ATLAS_PATH)
         .expect("Failed to save packed tilemap");
 }
 

@@ -3,11 +3,12 @@ use futures_lite::future;
 
 use crate::{
     game::world::{
+        biomes::resources::BiomeManager,
         helpers::{IntoChunkPos, IntoTranslation, IntoWorldPos},
         resources::WorldManager,
-        textures::helpers::{TextureMap, HeightMap}, biomes::resources::BiomeManager,
+        textures::helpers::{HeightMap, TextureMap}, ruletile::helpers::RuletileMap,
     },
-    math::{noise::generate_perlin_noise, map::ValueMap2D},
+    math::{map::ValueMap2D, noise::generate_perlin_noise},
 };
 
 use super::{
@@ -35,11 +36,13 @@ pub fn spawn_chunk(
     });
 }
 
+
 pub fn generate_texture_maps(
     mut commands: Commands,
     mut request_texture_map_event_reader: EventReader<RequestTextureMap>,
-    biome_manager: Res<BiomeManager>
+    biome_manager: Res<BiomeManager>,
 ) {
+    let seed = 1203;
     let noise_map_events: Vec<_> = request_texture_map_event_reader.iter().cloned().collect();
 
     for event in noise_map_events {
@@ -53,7 +56,7 @@ pub fn generate_texture_maps(
             let height_noise_map = HeightNoiseMap(generate_perlin_noise(
                 chunk_world_pos.x as i32,
                 chunk_world_pos.y as i32,
-                201,
+                seed,
                 HEIGHT_OFFSET,
                 HEIGHT_OCTAVES,
                 HEIGHT_LACUNARITY,
@@ -64,7 +67,7 @@ pub fn generate_texture_maps(
             let temperature_noise_map = TemperatureNoiseMap(generate_perlin_noise(
                 chunk_world_pos.x as i32,
                 chunk_world_pos.y as i32,
-                201,
+                seed,
                 TEMPERATURE_OFFSET,
                 TEMPERATURE_OCTAVES,
                 TEMPERATURE_LACUNARITY,
@@ -75,7 +78,7 @@ pub fn generate_texture_maps(
             let precipitation_noise_map = PrecipitationNoiseMap(generate_perlin_noise(
                 chunk_world_pos.x as i32,
                 chunk_world_pos.y as i32,
-                201,
+                seed,
                 PRECIPITATION_OFFSET,
                 PRECIPITATION_OCTAVES,
                 PRECIPITATION_LACUNARITY,
@@ -83,16 +86,21 @@ pub fn generate_texture_maps(
                 PRECIPITATION_FREQUENCY / PRECIPITATION_SCALE,
             ));
 
-            let mut height_map = HeightMap::generate(
-                height_noise_map,
-                precipitation_noise_map,
-            );
-
+            let mut height_map = HeightMap::generate(&height_noise_map, &precipitation_noise_map);
             height_map.smoothen_height_map(Some(3));
 
-            info!("Finished texture map");
+            let ruletile_map = RuletileMap::generate(&height_map);
+            let texture_map = TextureMap::generate(
+                &height_map,
+                &temperature_noise_map,
+                &precipitation_noise_map,
+                &ruletile_map,
+                &biome_manager,
+            );
 
-            (TextureMap::new((CHUNK_SIZE as usize, CHUNK_SIZE as usize)), chunk_world_pos)
+
+            info!("Finished texture map");
+            (texture_map, chunk_world_pos)
         });
 
         commands
