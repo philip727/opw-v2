@@ -1,26 +1,18 @@
 [
     {
         "id": "biome:grassland",
-        "texture_location": "./assets/tilemaps/grasslands.png"
+        "texture_location": "./assets/tilemaps/grasslands.png",
+        "rules": {
+            "precipitation": 0.57,
+            "temperature": 0.51
+        }
     },
     {
         "id": "biome:snowy_tundra",
-        "texture_location": "./assets/tilemaps/sandy.png"
-    },
-    {
-        "id": "biome:ajajajajajajah_tundra",
-        "texture_location": "./assets/tilemaps/snowy.png"
-    },
-    {
-        "id": "biome:ajajajajajajah_tundra",
-        "texture_location": "./assets/tilemaps/grassierlands.png"
-    },
-    {
-        "id": "biome:snowy_tundra",
-        "texture_location": "./assets/tilemaps/sandy.png"
-    },
-    {
-        "id": "biome:grassland",
-        "texture_location": "./assets/tilemaps/grasslands.png"
+        "texture_location": "./assets/tilemaps/snowy.png",
+        "rules": {
+            "precipitation": 0.87,
+            "temperature": 0.05
+        }
     }
 ]

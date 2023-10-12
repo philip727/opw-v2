@@ -1,25 +1,33 @@
-use bevy::prelude::info;
 use image::{io::Reader as ImageReader, GenericImageView, ImageBuffer};
 
-use crate::game::world::{
-    biomes::helpers::BiomeData,
-    generation::{
-        constants::{CHUNK_SIZE, TILE_SIZE, WATER_HEIGHT_THRESHOLD, WATER_PRECIPITATION_THRESHOLD},
-        helpers::*,
+use crate::{
+    game::world::{
+        biomes::helpers::BiomeData,
+        generation::{
+            constants::{
+                CHUNK_SIZE, TILE_SIZE, WATER_HEIGHT_THRESHOLD, WATER_PRECIPITATION_THRESHOLD,
+            },
+            helpers::*,
+        },
+        textures::constants::PACKED_TEXTURE_PATH,
     },
+    math::map::ValueMap2D,
 };
 
+use super::constants::{FILLED_HEIGHT, NEIGHBOURS_TO_CHECK, NON_FILLED_HEIGHT};
+
+pub type BiomeId = String;
 #[derive(Clone, Debug)]
-pub struct TextureMap {
+pub struct HeightMap {
     pub size: (usize, usize),
-    points: Vec<u32>,
+    points: Vec<u8>,
 }
 
-impl TextureMap {
-    pub fn new(size: (usize, usize)) -> Self {
+impl ValueMap2D<u8> for HeightMap {
+    fn new(size: (usize, usize)) -> Self {
         let (width, height) = size;
         let map_size = width * height;
-        let mut texture_map = TextureMap {
+        let texture_map = Self {
             size,
             points: vec![0; map_size],
         };
@@ -27,52 +35,121 @@ impl TextureMap {
         texture_map
     }
 
-    pub fn set_value(&mut self, x: usize, y: usize, value: u32) {
-        let (width, height) = self.size;
-
-        if x < width && y < height {
-            self.points[x + y * width] = value;
-        }
+    fn get_size(&self) -> (usize, usize) {
+        self.size
     }
 
-    pub fn get_value(&self, x: usize, y: usize) -> Option<u32> {
-        let (width, height) = self.size;
+    fn get_points(&self) -> &[u8] {
+        self.points.as_slice()
+    }
 
-        if x < width && y < height {
-            return Some(self.points[x + y * width]);
-        }
-
-        None
+    fn mut_points(&mut self) -> &mut Vec<u8> {
+        &mut self.points
     }
 }
 
-// Creates a texture map for us to render the chunk
-pub fn create_texture_map(
-    height_noise_map: HeightNoiseMap,
-    temperature_noise_map: TemperatureNoiseMap,
-    precipiation_noise_map: PrecipitationNoiseMap,
-) -> TextureMap {
-    let mut texture_map = TextureMap::new((CHUNK_SIZE as usize, CHUNK_SIZE as usize));
+#[derive(Clone, Debug)]
+pub struct TextureMap {
+    pub size: (usize, usize),
+    points: Vec<u32>,
+}
 
-    // Determines what tiles to put at certain co-ordinates
-    for x in 0..CHUNK_SIZE as usize {
-        for y in 0..CHUNK_SIZE as usize {
-            let height = height_noise_map.0.get_value(x, y);
-            let precipiation = precipiation_noise_map.0.get_value(x, y);
+impl ValueMap2D<u32> for TextureMap {
+    fn new(size: (usize, usize)) -> Self {
+        let (width, height) = size;
+        let map_size = width * height;
+        let texture_map = Self {
+            size,
+            points: vec![0; map_size],
+        };
 
-            if is_water_tile(height, precipiation) {
-                texture_map.set_value(x, y, 0);
-                continue;
+        texture_map
+    }
+
+    fn get_size(&self) -> (usize, usize) {
+        self.size
+    }
+
+    fn get_points(&self) -> &[u32] {
+        self.points.as_slice()
+    }
+
+    fn mut_points(&mut self) -> &mut Vec<u32> {
+        &mut self.points
+    }
+}
+
+impl HeightMap {
+    // Creates a height map for us to determine textures
+    pub fn generate(
+        height_noise_map: HeightNoiseMap,
+        precipitation_noise_map: PrecipitationNoiseMap,
+    ) -> HeightMap {
+        let mut height_map = HeightMap::new((CHUNK_SIZE as usize, CHUNK_SIZE as usize));
+        // Determines what tiles to put at certain co-ordinates
+        for x in 0..CHUNK_SIZE as usize {
+            for y in 0..CHUNK_SIZE as usize {
+                let height = height_noise_map.0.get_value(x, y) as f32;
+                let precipitation = precipitation_noise_map.0.get_value(x, y) as f32;
+
+                if is_water_tile(height, precipitation) {
+                    height_map.set_value(x, y, NON_FILLED_HEIGHT);
+                    continue;
+                }
+
+                height_map.set_value(x, y, FILLED_HEIGHT);
             }
+        }
 
-            texture_map.set_value(x, y, 1);
+        // Determine Biome Textures
+        // for x in 0..CHUNK_SIZE as usize {
+        //     for y in 0..CHUNK_SIZE as usize {
+        //         let height = height_noise_map.0.get_value(x, y) as f32;
+        //         let precipitation = precipitation_noise_map.0.get_value(x, y) as f32;
+        //         let temperature = temperature_noise_map.0.get_value(x, y) as f32;
+
+        //         let biome = determine_best_biome(precipitation, temperature, biome_manager);
+        //         biome_manager.get_biome_offset(biome);
+        //     }
+        // }
+
+        height_map
+    }
+    pub fn smoothen_height_map(&mut self, iterations: Option<u32>) {
+        let (width, height) = self.get_size();
+
+        for _ in 0..iterations.unwrap_or(1) {
+            for x in 0..width {
+                for y in 0..height {
+                    let current_texture = self.get_value(x, y).unwrap();
+                    if current_texture == NON_FILLED_HEIGHT {
+                        continue;
+                    }
+
+                    let mut neighbour_count = 0;
+                    for neighbour_to_check in NEIGHBOURS_TO_CHECK.iter() {
+                        // Casted like this to prevent weird overflow arithmetic
+                        let nx = x as isize + neighbour_to_check.0 as isize;
+                        let ny = y as isize + neighbour_to_check.1 as isize;
+
+                        if let Some(n_texture) = self.get_value(nx as usize, ny as usize) {
+                            if n_texture == FILLED_HEIGHT {
+                                neighbour_count += 1;
+                            }
+                        }
+                    }
+
+                    // If the tile only has 1 or less neighbours then we need to make it a lower height
+                    if neighbour_count < 2 {
+                        self.set_value(x, y, NON_FILLED_HEIGHT);
+                    }
+                }
+            }
         }
     }
-
-    texture_map
 }
 
-pub fn generate_packed_texture_map(biome_data: &Vec<BiomeData>) {
+pub fn generate_texture_atlas(biome_data: &Vec<BiomeData>) {
     let tile_size_u32 = TILE_SIZE as u32;
 
     // Image data
@@ -97,18 +174,18 @@ pub fn generate_packed_texture_map(biome_data: &Vec<BiomeData>) {
         }
     }
 
-    let packed_map = create_packed_map(IMAGE_WIDTH, image_height, tile_size_u32, &biome_data);
+    let packed_map = create_texture_atlas(IMAGE_WIDTH, image_height, tile_size_u32, &biome_data);
     packed_map
-        .save("assets/tilemaps/packed_tilemap.png")
+        .save(PACKED_TEXTURE_PATH)
         .expect("Failed to save packed tilemap");
 }
 
-pub fn is_water_tile(height: f64, precipiation: f64) -> bool {
+pub fn is_water_tile(height: f32, precipiation: f32) -> bool {
     height < WATER_HEIGHT_THRESHOLD && precipiation > WATER_PRECIPITATION_THRESHOLD
 }
 
 // Create packed map image buf
-fn create_packed_map(
+fn create_texture_atlas(
     image_width: u32,
     image_height: u32,
     tile_size: u32,
@@ -127,7 +204,7 @@ fn create_packed_map(
             .decode()
             .expect(&format!("Failed to load \"{}\"", biome.texture_location));
 
-        let tiles_in_tilemap = ((image.width() / tile_size) * (image.height() / tile_size));
+        let tiles_in_tilemap = (image.width() / tile_size) * (image.height() / tile_size);
         let tiles_per_row_tilemap = image.width() / tile_size;
 
         let mut row_pos_tilemap = 0u32;
@@ -143,11 +220,6 @@ fn create_packed_map(
             if tile_pos_packed_x % tiles_per_row_packed == 0 && col_pos_packed != 0 {
                 row_pos_packed += 1;
             }
-
-            info!(
-                "(1) packed: ({}, {}) // tilemap: ({}, {})",
-                tile_pos_packed_x, row_pos_packed, tile_pos_tilemap_x, row_pos_tilemap
-            );
 
             let dest_x_tilemap = tile_pos_tilemap_x * tile_size;
             let dest_y_tilemap = row_pos_tilemap * tile_size;

@@ -1,24 +1,25 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::tiles::{TilePos, TileStorage, TileTextureIndex};
 
-use crate::game::world::biomes::helpers::load_biome_data;
-use crate::game::world::textures::helpers::generate_packed_texture_map;
+use crate::game::world::biomes::resources::BiomeManager;
+use crate::game::world::states::WorldState;
+use crate::game::world::textures::helpers::generate_texture_atlas;
 use crate::game::world::{
     generation::{components::Chunk, events::RequestChunkRender},
     resources::WorldManager,
 };
+use crate::math::map::ValueMap2D;
 
-pub fn pack_textures() {
-    let biome_data = load_biome_data();
+pub fn pack_textures(biome_manager: Res<BiomeManager>, mut commands: Commands) {
+    info!("Textures packed into one map");
+    generate_texture_atlas(&biome_manager.loaded);
 
-    generate_packed_texture_map(&biome_data);
-
-    dbg!(biome_data);
+    commands.insert_resource(NextState(Some(WorldState::Created)));
 }
 
 pub fn handle_chunk_rerender(
     mut request_chunk_rerender_reader: EventReader<RequestChunkRender>,
-    mut world_manager: ResMut<WorldManager>,
+    world_manager: ResMut<WorldManager>,
     mut chunk_query: Query<&mut TileStorage, With<Chunk>>,
     mut tile_query: Query<(&TilePos, &mut TileTextureIndex)>,
 ) {
@@ -26,7 +27,7 @@ pub fn handle_chunk_rerender(
         let chunk_entity = world_manager.chunk_entity.unwrap();
         let texture_map = &event.texture_map;
 
-        if let Ok(mut tile_storage) = chunk_query.get_mut(chunk_entity) {
+        if let Ok(tile_storage) = chunk_query.get_mut(chunk_entity) {
             for tile_entity in tile_storage.iter() {
                 let tile_entity = tile_entity.unwrap();
 

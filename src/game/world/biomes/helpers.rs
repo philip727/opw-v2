@@ -1,17 +1,33 @@
 use std::{
-    fmt::format,
     fs::{self, File},
     io::Write,
 };
 
 use serde::{Deserialize, Serialize};
 
-use super::constants::{BIOMES_DATA_LOCATION, BIOMES_DATA_DEFAULT};
+use crate::math::noise::{euclidian_distance, normalize_noise_value};
 
-#[derive(Serialize, Deserialize, Debug)]
+use super::{
+    constants::{BIOMES_DATA_DEFAULT, BIOMES_DATA_LOCATION},
+    resources::BiomeManager,
+};
+
+pub type BiomeId = String;
+pub type BiomeOffset = u32;
+
+/// The data of a biome
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BiomeData {
-    pub id: String,
+    pub id: BiomeId,
     pub texture_location: String,
+    pub rules: BiomeRules,
+}
+
+/// The rules to spawn a biome for generation
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct BiomeRules {
+    pub precipitation: f32,
+    pub temperature: f32,
 }
 
 pub fn load_biome_data() -> Vec<BiomeData> {
@@ -33,4 +49,28 @@ pub fn load_biome_data() -> Vec<BiomeData> {
     // Loads the json biome data
     serde_json::from_str::<Vec<BiomeData>>(&data.unwrap())
         .expect(&format!("Failed to load {} json.", BIOMES_DATA_LOCATION))
+}
+
+pub fn determine_best_biome<'manager>(
+    precipitation: f32,
+    temperature: f32,
+    biome_manager: &'manager BiomeManager,
+) -> &'manager BiomeData {
+    let mut best_biome: &BiomeData = &biome_manager.loaded[0];
+    let mut best_euclidian = 999999f32;
+    for biome in biome_manager.loaded.iter() {
+        let euclidian = euclidian_distance(
+            normalize_noise_value(temperature),
+            normalize_noise_value(precipitation),
+            biome.rules.temperature,
+            biome.rules.precipitation,
+        );
+
+        if euclidian < best_euclidian {
+            best_biome = &biome;
+            best_euclidian = euclidian;
+        }
+    }
+
+    best_biome
 }

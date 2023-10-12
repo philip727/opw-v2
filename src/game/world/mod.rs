@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use self::{
-    generation::WorldGenerationPlugin, resources::WorldManager, textures::WorldTexturePlugin, systems::create_data_folder,
+    generation::WorldGenerationPlugin, resources::WorldManager, textures::WorldTexturePlugin, systems::{create_data_folder, enter_game}, states::WorldState, biomes::WorldBiomePlugin,
 };
 
 pub mod generation;
@@ -11,13 +11,15 @@ pub mod textures;
 pub mod biomes;
 pub mod systems;
 pub mod constants;
+pub mod states;
 
 pub struct WorldPlugins;
 
 impl Plugin for WorldPlugins {
     fn build(&self, app: &mut App) {
         app.init_resource::<WorldManager>()
-            .add_systems(Startup, create_data_folder)
-            .add_plugins((WorldGenerationPlugin, WorldTexturePlugin));
+            .add_state::<WorldState>()
+            .add_systems(Startup, (create_data_folder, enter_game))
+            .add_plugins((WorldGenerationPlugin, WorldTexturePlugin, WorldBiomePlugin));
     }
 }

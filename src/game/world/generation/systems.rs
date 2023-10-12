@@ -5,9 +5,9 @@ use crate::{
     game::world::{
         helpers::{IntoChunkPos, IntoTranslation, IntoWorldPos},
         resources::WorldManager,
-        textures::helpers::create_texture_map,
+        textures::helpers::{TextureMap, HeightMap}, biomes::resources::BiomeManager,
     },
-    math::noise::generate_perlin_noise,
+    math::{noise::generate_perlin_noise, map::ValueMap2D},
 };
 
 use super::{
@@ -23,6 +23,7 @@ pub fn spawn_chunk(
     mut world_manager: ResMut<WorldManager>,
     mut request_texture_map_event_writer: EventWriter<RequestTextureMap>,
 ) {
+    println!("Main chunk spawned");
     let start_pos = Vec2 { x: 0.0, y: 0.0 };
     let chunk_pos = start_pos.to_chunk_pos();
 
@@ -37,12 +38,15 @@ pub fn spawn_chunk(
 pub fn generate_texture_maps(
     mut commands: Commands,
     mut request_texture_map_event_reader: EventReader<RequestTextureMap>,
+    biome_manager: Res<BiomeManager>
 ) {
     let noise_map_events: Vec<_> = request_texture_map_event_reader.iter().cloned().collect();
-    let thread_pool = AsyncComputeTaskPool::get();
 
     for event in noise_map_events {
+        let thread_pool = AsyncComputeTaskPool::get();
         let chunk_world_pos = event.world_position.clone();
+        let biome_manager = biome_manager.clone();
+        info!("Generating new texture map");
 
         // Moves the noise generation on to a seperate thread
         let task = thread_pool.spawn(async move {
@@ -79,13 +83,16 @@ pub fn generate_texture_maps(
                 PRECIPITATION_FREQUENCY / PRECIPITATION_SCALE,
             ));
 
-            let texture_map = create_texture_map(
+            let mut height_map = HeightMap::generate(
                 height_noise_map,
-                temperature_noise_map,
                 precipitation_noise_map,
             );
 
-            (texture_map, chunk_world_pos)
+            height_map.smoothen_height_map(Some(3));
+
+            info!("Finished texture map");
+
+            (TextureMap::new((CHUNK_SIZE as usize, CHUNK_SIZE as usize)), chunk_world_pos)
         });
 
         commands

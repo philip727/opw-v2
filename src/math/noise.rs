@@ -34,3 +34,14 @@ pub fn generate_perlin_noise(
 
     noise_map
 }
+
+pub fn normalize_noise_value(nv: f32) -> f32 {
+    (nv + 1.0) / 2.0
+}
+
+pub fn euclidian_distance(a_x: f32, a_y: f32, b_x: f32, b_y: f32) -> f32 {
+    let x_distance = (b_x - a_x).powi(2);
+    let y_distance = (b_y - a_y).powi(2);
+
+    (x_distance + y_distance).abs().sqrt()
+}
