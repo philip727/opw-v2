@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::game::world::{helpers::{WorldPos, ThresholdPos}, textures::helpers::TextureMap};
+use crate::game::world::{helpers::{WorldPos, ThresholdPos}, textures::helpers::TextureMap, ruletile::helpers::RuletileMap};
 
 #[derive(Debug, Event, Clone)]
 pub struct RequestTextureMap {
@@ -9,6 +9,7 @@ pub struct RequestTextureMap {
 
 #[derive(Debug, Event, Clone)]
 pub struct RequestChunkRender {
+    pub ruletile_map: RuletileMap,
     pub texture_map: TextureMap,
-    pub world_position: Vec3
+    pub world_position: Vec3,
 }

@@ -3,6 +3,7 @@ use bevy_ecs_tilemap::prelude::*;
 use noise::utils::NoiseMap;
 
 use crate::game::world::{
+    collisions::components::TileProperties,
     helpers::{
         adjust_translation_for_chunk, ChunkPos, IntoTranslation, SetZToChunkZ, ThresholdPos,
     },
@@ -40,12 +41,15 @@ pub fn create_chunk_tilemap(
         for y in 0..CHUNK_SIZE {
             let tile_pos = TilePos { x, y };
             let tile_entity = commands
-                .spawn(TileBundle {
-                    position: tile_pos,
-                    tilemap_id: TilemapId(tilemap_entity),
-                    texture_index: TileTextureIndex(0),
-                    ..Default::default()
-                })
+                .spawn((
+                    TileBundle {
+                        position: tile_pos,
+                        tilemap_id: TilemapId(tilemap_entity),
+                        texture_index: TileTextureIndex(0),
+                        ..Default::default()
+                    },
+                    TileProperties::default(),
+                ))
                 .id();
 
             commands.entity(tilemap_entity).add_child(tile_entity);

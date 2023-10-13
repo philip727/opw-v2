@@ -6,6 +6,7 @@ use super::world::states::WorldState;
 
 pub mod components;
 pub mod systems;
+pub mod constants;
 
 pub struct PlayerPlugins;
 

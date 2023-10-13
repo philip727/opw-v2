@@ -2,7 +2,6 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::tiles::{TilePos, TileStorage, TileTextureIndex};
 
 use crate::game::world::biomes::resources::BiomeManager;
-use crate::game::world::generation::resources::WorldGenerationManager;
 use crate::game::world::helpers::adjust_translation_for_chunk;
 use crate::game::world::states::WorldState;
 use crate::game::world::textures::helpers::generate_texture_atlas;
@@ -11,8 +10,6 @@ use crate::game::world::{
     resources::WorldManager,
 };
 use crate::math::map::ValueMap2D;
-
-use super::resources::WorldTextureManager;
 
 pub fn pack_textures(biome_manager: Res<BiomeManager>, mut commands: Commands) {
     info!("Texture atlas created");
@@ -23,7 +20,7 @@ pub fn pack_textures(biome_manager: Res<BiomeManager>, mut commands: Commands) {
 
 pub fn handle_chunk_rerender(
     mut request_chunk_rerender_reader: EventReader<RequestChunkRender>,
-    world_manager: ResMut<WorldManager>,
+    world_manager: Res<WorldManager>,
     mut chunk_query: Query<(&mut TileStorage, &mut Transform), With<Chunk>>,
     mut tile_query: Query<(&TilePos, &mut TileTextureIndex)>,
 ) {

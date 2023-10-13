@@ -1,9 +1,9 @@
 use bevy::{prelude::*, tasks::Task};
 
-use crate::game::world::{textures::helpers::TextureMap, helpers::{WorldPos, ThresholdPos}};
+use crate::game::world::{textures::helpers::TextureMap, helpers::ThresholdPos, ruletile::helpers::RuletileMap};
 
 #[derive(Component)]
-pub struct ComputeTextureMap(pub Task<(TextureMap, ThresholdPos)>);
+pub struct ComputeTextureMap(pub Task<(TextureMap, RuletileMap, ThresholdPos)>);
 
 #[derive(Component)]
 pub struct Chunk;

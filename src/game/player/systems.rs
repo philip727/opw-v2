@@ -1,14 +1,21 @@
 use bevy::prelude::*;
+use bevy_ecs_tilemap::tiles::TilePos;
 
-use crate::game::{camera::components::CameraTarget, world::generation::components::ChunkTarget};
+use crate::game::{
+    camera::components::CameraTarget,
+    world::{
+        collisions::{components::TileProperties, helpers::colliding_with_wall},
+        generation::components::{Chunk, ChunkTarget},
+    },
+};
 
-use super::components::MovementController;
+use super::{components::MovementController, constants::PLAYER_POS_Z};
 
 pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands
         .spawn(SpriteBundle {
             texture: asset_server.load("player/skins/default/default.png"),
-            transform: Transform::from_xyz(0.0, 0.0, 2.0),
+            transform: Transform::from_xyz(0.0, 0.0, PLAYER_POS_Z),
             ..Default::default()
         })
         .insert((
@@ -20,7 +27,9 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn manage_movement(
     keyboard_input: Res<Input<KeyCode>>,
-    mut player_query: Query<(&mut Transform, &MovementController), With<MovementController>>,
+    mut player_query: Query<(&mut Transform, &MovementController)>,
+    tile_query: Query<(&TileProperties, &TilePos)>,
+    chunk_query: Query<&Transform, (With<Chunk>, Without<MovementController>)>,
     time: Res<Time>,
 ) {
     if let Ok((mut transform, movement_controller)) = player_query.get_single_mut() {
@@ -42,7 +51,17 @@ pub fn manage_movement(
             y_delta = -1.0;
         }
 
-        direction += Vec3::new(x_delta, y_delta, 0.0);
+        let chunk_transform = chunk_query.single();
+        let target = transform.translation + Vec3::new(x_delta, 0.0, 0.0);
+        if !colliding_with_wall(target, &tile_query, &chunk_transform) {
+            direction += Vec3::new(x_delta, 0.0, 0.0);
+        }
+
+        let target = transform.translation + Vec3::new(0.0, y_delta, 0.0);
+        if !colliding_with_wall(target, &tile_query, &chunk_transform) {
+            direction += Vec3::new(0.0, y_delta, 0.0);
+        }
+
         if !(direction.length() > 0.0) {
             return;
         }

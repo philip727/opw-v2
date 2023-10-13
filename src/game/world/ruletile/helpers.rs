@@ -11,7 +11,7 @@ use crate::{
 };
 use bevy::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct RuletileMap {
     pub size: (usize, usize),
     points: Vec<RuleTile>,

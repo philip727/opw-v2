@@ -7,5 +7,4 @@ use super::helpers::TextureMap;
 #[derive(Resource, Default)]
 pub struct WorldTextureManager {
     pub cached_texture_maps: HashMap<ThresholdPos, TextureMap>,
-    pub current_texture_map: Option<TextureMap>
 }

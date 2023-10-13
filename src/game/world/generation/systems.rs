@@ -4,6 +4,7 @@ use futures_lite::future;
 use crate::{
     game::world::{
         biomes::resources::BiomeManager,
+        collisions::resources::WorldCollisionManager,
         helpers::{IntoThresholdPos, IntoTranslation, IntoWorldPos, SetZToChunkZ, ThresholdPos},
         resources::WorldManager,
         ruletile::helpers::RuletileMap,
@@ -63,6 +64,7 @@ pub fn generate_texture_for_chunk(
     mut commands: Commands,
     mut request_texture_map_event_reader: EventReader<RequestTextureMap>,
     world_texture_manager: Res<WorldTextureManager>,
+    world_collsion_manager: Res<WorldCollisionManager>,
     biome_manager: Res<BiomeManager>,
 ) {
     let seed = 1203;
@@ -74,14 +76,18 @@ pub fn generate_texture_for_chunk(
         let thread_pool = AsyncComputeTaskPool::get();
         let threshold_pos = event.threshold_pos.clone();
         let world_pos = event.threshold_pos.clone().to_translation().to_world_pos();
-        let cached_maps = world_texture_manager.cached_texture_maps.clone();
+        let cached_textures = world_texture_manager.cached_texture_maps.clone();
+        let cached_ruletiles = world_collsion_manager.cached_ruletile_maps.clone();
         let biome_manager = biome_manager.clone();
 
         // Moves the noise generation on to a seperate thread
         let task = thread_pool.spawn(async move {
             // Checks for a cached map and saves generating the perlin noise
-            if let Some(texture_map) = cached_maps.get(&threshold_pos) {
-                return (texture_map.clone(), threshold_pos);
+            if let (Some(texture_map), Some(ruletile_map)) = (
+                cached_textures.get(&threshold_pos),
+                cached_ruletiles.get(&threshold_pos),
+            ) {
+                return (texture_map.clone(), ruletile_map.clone(), threshold_pos);
             }
 
             let height_noise_map = HeightNoiseMap(generate_perlin_noise(
@@ -134,7 +140,7 @@ pub fn generate_texture_for_chunk(
             );
 
             info!("Finished texture map");
-            (texture_map, threshold_pos)
+            (texture_map, ruletile_map, threshold_pos)
         });
 
         commands
@@ -148,11 +154,13 @@ pub fn handle_texture_map_generation_task(
     mut texture_map_tasks: Query<(Entity, &mut ComputeTextureMap)>,
     mut request_chunk_rerender_event_writer: EventWriter<RequestChunkRender>,
     mut world_texture_manager: ResMut<WorldTextureManager>,
+    mut world_collision_manager: ResMut<WorldCollisionManager>,
 ) {
     for (task_entity, mut task) in &mut texture_map_tasks {
-        if let Some((texture_map, threshold_pos)) = future::block_on(future::poll_once(&mut task.0))
+        if let Some((texture_map, ruletile_map, threshold_pos)) =
+            future::block_on(future::poll_once(&mut task.0))
         {
-            // If the texture map isn't cached, then we need to store it
+            // Less perlin noise calculations
             if let None = world_texture_manager
                 .cached_texture_maps
                 .get(&threshold_pos)
@@ -162,11 +170,19 @@ pub fn handle_texture_map_generation_task(
                     .insert(threshold_pos, texture_map.clone());
             }
 
-            // This is for colliders and object spawning
-            world_texture_manager.current_texture_map = Some(texture_map.clone());
+            // Stored for collision maps
+            if let None = world_collision_manager
+                .cached_ruletile_maps
+                .get(&threshold_pos)
+            {
+                world_collision_manager
+                    .cached_ruletile_maps
+                    .insert(threshold_pos, ruletile_map.clone());
+            }
 
             request_chunk_rerender_event_writer.send(RequestChunkRender {
                 texture_map,
+                ruletile_map,
                 world_position: threshold_pos.to_translation().set_z_to_chunk_z(),
             });
 
