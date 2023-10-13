@@ -1,6 +1,6 @@
 use crate::{
     game::world::{
-        biomes::helpers::BiomeData,
+        biomes::helpers::{BiomeData, TileTextureData},
         generation::constants::CHUNK_SIZE,
         textures::{
             constants::{FILLED_HEIGHT, NON_FILLED_HEIGHT},
@@ -120,22 +120,22 @@ impl RuleTile {
         Self::Water
     }
 
-    pub fn get_texture_offset(&self, biome_data: &BiomeData) -> u8 {
+    pub fn get_tile_data<'biome>(&self, biome_data: &'biome BiomeData) -> &'biome TileTextureData {
         match self {
-            TopLeft => biome_data.tiles.top_left,
-            TopMiddle => biome_data.tiles.top_middle,
-            TopRight => biome_data.tiles.top_right,
-            Middle => biome_data.tiles.middle,
-            MiddleLeft => biome_data.tiles.middle_left,
-            MiddleRight => biome_data.tiles.middle_right,
-            DownRight => biome_data.tiles.down_right,
-            DownLeft => biome_data.tiles.down_left,
-            UpRight => biome_data.tiles.up_right,
-            UpLeft => biome_data.tiles.up_left,
-            BottomLeft => biome_data.tiles.bottom_left,
-            BottomMiddle => biome_data.tiles.bottom_middle,
-            BottomRight => biome_data.tiles.bottom_right,
-            Water => biome_data.tiles.water,
+            TopLeft => &biome_data.tiles.top_left,
+            TopMiddle => &biome_data.tiles.top_middle,
+            TopRight => &biome_data.tiles.top_right,
+            Middle => &biome_data.tiles.middle,
+            MiddleLeft => &biome_data.tiles.middle_left,
+            MiddleRight => &biome_data.tiles.middle_right,
+            DownRight => &biome_data.tiles.down_right,
+            DownLeft => &biome_data.tiles.down_left,
+            UpRight => &biome_data.tiles.up_right,
+            UpLeft => &biome_data.tiles.up_left,
+            BottomLeft => &biome_data.tiles.bottom_left,
+            BottomMiddle => &biome_data.tiles.bottom_middle,
+            BottomRight => &biome_data.tiles.bottom_right,
+            Water => &biome_data.tiles.water,
         }
     }
 

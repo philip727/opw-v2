@@ -3,7 +3,7 @@ use image::{io::Reader as ImageReader, GenericImageView, ImageBuffer};
 use crate::{
     game::world::{
         biomes::{
-            helpers::{determine_best_biome, BiomeData},
+            helpers::{determine_best_biome, BiomeData, BiomeOffset, TileTextureData},
             resources::BiomeManager,
         },
         generation::{
@@ -18,7 +18,9 @@ use crate::{
     math::map::ValueMap2D,
 };
 
-use super::constants::{FILLED_HEIGHT, NEIGHBOURS_TO_CHECK, NON_FILLED_HEIGHT, REQUIRED_NEIGHBOURS};
+use super::constants::{
+    FILLED_HEIGHT, NEIGHBOURS_TO_CHECK, NON_FILLED_HEIGHT, REQUIRED_NEIGHBOURS,
+};
 
 pub type BiomeId = String;
 #[derive(Clone, Debug)]
@@ -55,12 +57,11 @@ impl ValueMap2D<u8> for HeightMap {
 #[derive(Clone, Debug)]
 pub struct TextureMap {
     pub size: (usize, usize),
-    points: Vec<u32>,
+    points: Vec<(BiomeOffset, TileTextureData)>,
 }
 
 impl TextureMap {
     pub fn generate(
-        height_map: &HeightMap,
         temperature_noise_map: &TemperatureNoiseMap,
         precipitation_noise_map: &PrecipitationNoiseMap,
         ruletile_map: &RuletileMap,
@@ -69,7 +70,6 @@ impl TextureMap {
         let mut texture_map = TextureMap::new((CHUNK_SIZE as usize, CHUNK_SIZE as usize));
         for x in 0..CHUNK_SIZE as usize {
             for y in 0..CHUNK_SIZE as usize {
-                let height = height_map.get_value(x, y).unwrap();
                 let precipitation = precipitation_noise_map.0.get_value(x, y) as f32;
                 let temperature = temperature_noise_map.0.get_value(x, y) as f32;
                 let ruletile = ruletile_map.get_value(x, y).unwrap_or(RuleTile::Water);
@@ -77,11 +77,7 @@ impl TextureMap {
                 let biome = determine_best_biome(precipitation, temperature, biome_manager);
                 let tile_offset = biome_manager.get_biome_offset(biome).unwrap();
 
-                texture_map.set_value(
-                    x,
-                    y,
-                    tile_offset + ruletile.get_texture_offset(&biome) as u32,
-                );
+                texture_map.set_value(x, y, (*tile_offset, ruletile.get_tile_data(&biome).clone()));
             }
         }
 
@@ -89,13 +85,13 @@ impl TextureMap {
     }
 }
 
-impl ValueMap2D<u32> for TextureMap {
+impl ValueMap2D<(BiomeOffset, TileTextureData)> for TextureMap {
     fn new(size: (usize, usize)) -> Self {
         let (width, height) = size;
         let map_size = width * height;
         let texture_map = Self {
             size,
-            points: vec![0; map_size],
+            points: vec![(0, TileTextureData::new()); map_size],
         };
 
         texture_map
@@ -105,11 +101,11 @@ impl ValueMap2D<u32> for TextureMap {
         self.size
     }
 
-    fn get_points(&self) -> &[u32] {
+    fn get_points(&self) -> &[(BiomeOffset, TileTextureData)] {
         self.points.as_slice()
     }
 
-    fn mut_points(&mut self) -> &mut Vec<u32> {
+    fn mut_points(&mut self) -> &mut Vec<(BiomeOffset, TileTextureData)> {
         &mut self.points
     }
 }

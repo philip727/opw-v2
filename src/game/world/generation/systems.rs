@@ -132,7 +132,6 @@ pub fn generate_texture_for_chunk(
             let ruletile_map = RuletileMap::generate(&height_map);
             // Finds the textures based on biome and ruletile
             let texture_map = TextureMap::generate(
-                &height_map,
                 &temperature_noise_map,
                 &precipitation_noise_map,
                 &ruletile_map,

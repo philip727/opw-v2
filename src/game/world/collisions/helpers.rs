@@ -3,7 +3,7 @@ use bevy_ecs_tilemap::tiles::TilePos;
 
 use crate::game::{
     player::constants::PLAYER_POS_Z,
-    world::generation::{components::Chunk, constants::TILE_SIZE},
+    world::generation::constants::TILE_SIZE,
 };
 
 use super::components::TileProperties;

@@ -7,20 +7,118 @@
             "temperature": 0.51
         },
         "tiles": {
-            "water": 13,
-            "top_left": 0,
-            "top_middle": 1,
-            "top_right": 2,
-            "middle": 3,
-            "middle_left": 4,
-            "middle_right": 5,
-            "down_right": 6,
-            "down_left": 7,
-            "up_right": 8,
-            "up_left": 9,
-            "bottom_left": 10,
-            "bottom_middle": 11,
-            "bottom_right": 12
+            "water": {
+                "style": "Animated",
+                "textures": [
+                    13, 0, 2
+                ],
+                "animation_length": 2.0,
+                "index": 0
+            },
+            "top_left": {
+                "style": "Single",
+                "textures": [
+                    0
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "top_middle": {
+                "style": "Single",
+                "textures": [
+                    1
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "top_right": {
+                "style": "Single",
+                "textures": [
+                    2
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "middle": {
+                "style": "Single",
+                "textures": [
+                    3
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "middle_left": {
+                "style": "Single",
+                "textures": [
+                    4
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "middle_right": {
+                "style": "Single",
+                "textures": [
+                    5
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "down_right": {
+                "style": "Single",
+                "textures": [
+                    6
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "down_left": {
+                "style": "Single",
+                "textures": [
+                    7
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "up_right": {
+                "style": "Single",
+                "textures": [
+                    8
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "up_left": {
+                "style": "Single",
+                "textures": [
+                    9
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "bottom_left": {
+                "style": "Single",
+                "textures": [
+                    10
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "bottom_middle": {
+                "style": "Single",
+                "textures": [
+                    11
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "bottom_right": {
+                "style": "Single",
+                "textures": [
+                    12
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            }
         }
     },
     {
@@ -31,20 +129,118 @@
             "temperature": 0.05
         },
         "tiles": {
-            "water": 13,
-            "top_left": 0,
-            "top_middle": 1,
-            "top_right": 2,
-            "middle": 3,
-            "middle_left": 4,
-            "middle_right": 5,
-            "down_right": 6,
-            "down_left": 7,
-            "up_right": 8,
-            "up_left": 9,
-            "bottom_left": 10,
-            "bottom_middle": 11,
-            "bottom_right": 12
+            "water": {
+                "style": "Single",
+                "textures": [
+                    13
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "top_left": {
+                "style": "Single",
+                "textures": [
+                    0
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "top_middle": {
+                "style": "Single",
+                "textures": [
+                    1
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "top_right": {
+                "style": "Single",
+                "textures": [
+                    2
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "middle": {
+                "style": "Single",
+                "textures": [
+                    3
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "middle_left": {
+                "style": "Single",
+                "textures": [
+                    4
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "middle_right": {
+                "style": "Single",
+                "textures": [
+                    5
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "down_right": {
+                "style": "Single",
+                "textures": [
+                    6
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "down_left": {
+                "style": "Single",
+                "textures": [
+                    7
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "up_right": {
+                "style": "Single",
+                "textures": [
+                    8
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "up_left": {
+                "style": "Single",
+                "textures": [
+                    9
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "bottom_left": {
+                "style": "Single",
+                "textures": [
+                    10
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "bottom_middle": {
+                "style": "Single",
+                "textures": [
+                    11
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "bottom_right": {
+                "style": "Single",
+                "textures": [
+                    12
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            }
         }
     },
     {
@@ -55,20 +251,118 @@
             "temperature": 0.95
         },
         "tiles": {
-            "water": 13,
-            "top_left": 0,
-            "top_middle": 1,
-            "top_right": 2,
-            "middle": 3,
-            "middle_left": 4,
-            "middle_right": 5,
-            "down_right": 6,
-            "down_left": 7,
-            "up_right": 8,
-            "up_left": 9,
-            "bottom_left": 10,
-            "bottom_middle": 11,
-            "bottom_right": 12
+            "water": {
+                "style": "Single",
+                "textures": [
+                    13
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "top_left": {
+                "style": "Single",
+                "textures": [
+                    0
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "top_middle": {
+                "style": "Single",
+                "textures": [
+                    1
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "top_right": {
+                "style": "Single",
+                "textures": [
+                    2
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "middle": {
+                "style": "Single",
+                "textures": [
+                    3
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "middle_left": {
+                "style": "Single",
+                "textures": [
+                    4
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "middle_right": {
+                "style": "Single",
+                "textures": [
+                    5
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "down_right": {
+                "style": "Single",
+                "textures": [
+                    6
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "down_left": {
+                "style": "Single",
+                "textures": [
+                    7
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "up_right": {
+                "style": "Single",
+                "textures": [
+                    8
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "up_left": {
+                "style": "Single",
+                "textures": [
+                    9
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "bottom_left": {
+                "style": "Single",
+                "textures": [
+                    10
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "bottom_middle": {
+                "style": "Single",
+                "textures": [
+                    11
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            },
+            "bottom_right": {
+                "style": "Single",
+                "textures": [
+                    12
+                ],
+                "animation_length": 1.0,
+                "index": 0
+            }
         }
     }
 ]

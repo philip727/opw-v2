@@ -1,4 +1,7 @@
-pub trait ValueMap2D<TValue> where TValue: PartialEq + Eq + Sized + Copy + Clone {
+pub trait ValueMap2D<TValue>
+where
+    TValue: PartialEq + Sized + Clone,
+{
     fn new(size: (usize, usize)) -> Self;
     fn get_size(&self) -> (usize, usize);
     fn get_points(&self) -> &[TValue];
@@ -16,7 +19,7 @@ pub trait ValueMap2D<TValue> where TValue: PartialEq + Eq + Sized + Copy + Clone
         let (width, height) = self.get_size();
 
         if x < width && y < height {
-            return Some(self.get_points()[x + y * width]);
+            return Some(self.get_points()[x + y * width].clone());
         }
 
         None

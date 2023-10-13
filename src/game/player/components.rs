@@ -7,6 +7,6 @@ pub struct MovementController {
 
 impl Default for MovementController {
     fn default() -> Self {
-        MovementController { speed: 400.0f32 }
+        MovementController { speed: 130.0f32 }
     }
 }

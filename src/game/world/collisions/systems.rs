@@ -1,10 +1,9 @@
-use bevy::{ecs::event, prelude::*};
+use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
 use crate::{
     game::world::{
-        generation::{components::Chunk, events::RequestChunkRender},
-        resources::WorldManager,
+        generation::events::RequestChunkRender, resources::WorldManager,
         ruletile::helpers::RuleTile,
     },
     math::map::ValueMap2D,

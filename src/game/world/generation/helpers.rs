@@ -5,7 +5,7 @@ use noise::utils::NoiseMap;
 use crate::game::world::{
     collisions::components::TileProperties,
     helpers::{
-        adjust_translation_for_chunk, ChunkPos, IntoTranslation, SetZToChunkZ, ThresholdPos,
+        adjust_translation_for_chunk, IntoTranslation, SetZToChunkZ, ThresholdPos,
     },
     textures::constants::ASSET_TEXTURE_ATLAS_PATH,
 };

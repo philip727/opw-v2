@@ -1,10 +1,12 @@
 use bevy::prelude::*;
 
-use crate::game::world::{helpers::{WorldPos, ThresholdPos}, textures::helpers::TextureMap, ruletile::helpers::RuletileMap};
+use crate::game::world::{
+    helpers::ThresholdPos, ruletile::helpers::RuletileMap, textures::helpers::TextureMap,
+};
 
 #[derive(Debug, Event, Clone)]
 pub struct RequestTextureMap {
-    pub threshold_pos: ThresholdPos
+    pub threshold_pos: ThresholdPos,
 }
 
 #[derive(Debug, Event, Clone)]

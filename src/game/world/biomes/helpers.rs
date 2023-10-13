@@ -3,6 +3,7 @@ use std::{
     io::Write,
 };
 
+use bevy::prelude::info;
 use serde::{Deserialize, Serialize};
 
 use crate::math::noise::{euclidian_distance, normalize_noise_value};
@@ -34,20 +35,73 @@ pub struct BiomeRules {
 /// The common tiles on the tilemap
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct BiomeTiles {
-    pub water: u8,
-    pub top_left: u8,
-    pub top_middle: u8,
-    pub top_right: u8,
-    pub middle: u8,
-    pub middle_left: u8,
-    pub middle_right: u8,
-    pub down_right: u8,
-    pub down_left: u8,
-    pub up_right: u8,
-    pub up_left: u8,
-    pub bottom_left: u8,
-    pub bottom_middle: u8,
-    pub bottom_right: u8,
+    pub water: TileTextureData,
+    pub top_left: TileTextureData,
+    pub top_middle: TileTextureData,
+    pub top_right: TileTextureData,
+    pub middle: TileTextureData,
+    pub middle_left: TileTextureData,
+    pub middle_right: TileTextureData,
+    pub down_right: TileTextureData,
+    pub down_left: TileTextureData,
+    pub up_right: TileTextureData,
+    pub up_left: TileTextureData,
+    pub bottom_left: TileTextureData,
+    pub bottom_middle: TileTextureData,
+    pub bottom_right: TileTextureData,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct TileTextureData {
+    pub style: TileStyle,
+    pub textures: Vec<u8>,
+    pub animation_length: f32,
+    index: usize,
+
+}
+
+impl TileTextureData {
+    pub fn new() -> TileTextureData {
+        TileTextureData {
+            style: TileStyle::Single,
+            textures: Vec::new(),
+            animation_length: 1.0f32,
+            index: 0,
+        }
+    }
+
+    pub fn get_offset(&self) -> u8 {
+        match self.style {
+            TileStyle::Single => self.textures[0],
+            TileStyle::Animated => self.textures[0],
+            TileStyle::Random => self.textures[0],
+        }
+    }
+}
+
+impl Iterator for TileTextureData {
+    type Item = u8;
+
+    // Iterates over each tile texture
+    fn next(&mut self) -> Option<Self::Item> {
+        let item = self.textures[self.index];
+        info!("{}", item);
+        if self.index >= self.textures.len() - 1 {
+            self.index = 0;
+            return None;
+        } else {
+            self.index += 1
+        };
+
+        Some(item)
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub enum TileStyle {
+    Single,
+    Animated,
+    Random,
 }
 
 pub fn load_biome_data() -> Vec<BiomeData> {

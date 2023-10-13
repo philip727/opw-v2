@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::tiles::{TilePos, TileStorage, TileTextureIndex};
 
 use crate::game::world::biomes::resources::BiomeManager;
+use crate::game::world::collisions::components::TileProperties;
 use crate::game::world::helpers::adjust_translation_for_chunk;
 use crate::game::world::states::WorldState;
 use crate::game::world::textures::helpers::generate_texture_atlas;
@@ -22,7 +23,7 @@ pub fn handle_chunk_rerender(
     mut request_chunk_rerender_reader: EventReader<RequestChunkRender>,
     world_manager: Res<WorldManager>,
     mut chunk_query: Query<(&mut TileStorage, &mut Transform), With<Chunk>>,
-    mut tile_query: Query<(&TilePos, &mut TileTextureIndex)>,
+    mut tile_query: Query<(&TilePos, &mut TileTextureIndex, &mut TileProperties)>,
 ) {
     for event in request_chunk_rerender_reader.iter() {
         if let Some(chunk_entity) = world_manager.chunk_entity {
@@ -34,14 +35,18 @@ pub fn handle_chunk_rerender(
                 for tile_entity in tile_storage.iter() {
                     let tile_entity = tile_entity.unwrap();
 
-                    let (tile_pos, mut tile_texture_index) =
+                    let (tile_pos, mut tile_texture_index, mut tile_properties) =
                         tile_query.get_mut(tile_entity).unwrap();
 
                     let texture_index =
                         texture_map.get_value(tile_pos.x as usize, tile_pos.y as usize);
 
-                    if let Some(texture_index) = texture_index {
-                        *tile_texture_index = TileTextureIndex(texture_index);
+                    if let Some((biome_offset, data)) = texture_index {
+                        // Clones the data so we can animate and do things with tiles
+                        tile_properties.data = data.clone();
+
+                        *tile_texture_index =
+                            TileTextureIndex(biome_offset + data.get_offset() as u32);
                     }
                 }
 
