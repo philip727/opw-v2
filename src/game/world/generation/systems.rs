@@ -10,7 +10,10 @@ use crate::{
         },
         resources::WorldManager,
         ruletile::helpers::RuletileMap,
-        textures::helpers::{HeightMap, TextureMap},
+        textures::{
+            helpers::{HeightMap, TextureMap},
+            resources::WorldTextureManager,
+        },
     },
     math::{map::ValueMap2D, noise::generate_perlin_noise},
 };
@@ -50,32 +53,39 @@ pub fn update_chunk_from_target(
     if world_gen_manager.last_update_pos == target_threshold_pos {
         return;
     }
+    info!("Request chunk update");
 
-    info!("Update chunk position");
     // Moves the chunk to the right position
     world_gen_manager.last_update_pos = target_threshold_pos;
     request_texture_map_event_writer.send(RequestTextureMap {
-        threshold_pos: target_threshold_pos
+        threshold_pos: target_threshold_pos,
     });
 }
 
-pub fn generate_texture_maps(
+pub fn generate_texture_for_chunk(
     mut commands: Commands,
     mut request_texture_map_event_reader: EventReader<RequestTextureMap>,
+    world_texture_manager: Res<WorldTextureManager>,
     biome_manager: Res<BiomeManager>,
 ) {
     let seed = 1203;
     let noise_map_events: Vec<_> = request_texture_map_event_reader.iter().cloned().collect();
 
     for event in noise_map_events {
+        info!("Generating new texture map");
+
         let thread_pool = AsyncComputeTaskPool::get();
         let threshold_pos = event.threshold_pos.clone();
         let world_pos = event.threshold_pos.clone().to_translation().to_world_pos();
+        let cached_maps = world_texture_manager.cached_texture_maps.clone();
         let biome_manager = biome_manager.clone();
-        info!("Generating new texture map");
 
         // Moves the noise generation on to a seperate thread
         let task = thread_pool.spawn(async move {
+            if let Some(texture_map) = cached_maps.get(&threshold_pos) {
+                return (texture_map.clone(), threshold_pos);
+            }
+
             let height_noise_map = HeightNoiseMap(generate_perlin_noise(
                 world_pos.x as i32,
                 world_pos.y as i32,
@@ -111,7 +121,6 @@ pub fn generate_texture_maps(
 
             let mut height_map = HeightMap::generate(&height_noise_map, &precipitation_noise_map);
             height_map.smoothen_height_map(Some(3));
-
             let ruletile_map = RuletileMap::generate(&height_map);
             let texture_map = TextureMap::generate(
                 &height_map,
@@ -122,7 +131,7 @@ pub fn generate_texture_maps(
             );
 
             info!("Finished texture map");
-            (texture_map, threshold_pos.to_translation().set_z_to_chunk_z())
+            (texture_map, threshold_pos)
         });
 
         commands
@@ -135,12 +144,18 @@ pub fn handle_texture_map_generation_task(
     mut commands: Commands,
     mut texture_map_tasks: Query<(Entity, &mut ComputeTextureMap)>,
     mut request_chunk_rerender_event_writer: EventWriter<RequestChunkRender>,
+    mut world_texture_manager: ResMut<WorldTextureManager>,
 ) {
     for (task_entity, mut task) in &mut texture_map_tasks {
-        if let Some((texture_map, world_pos)) = future::block_on(future::poll_once(&mut task.0)) {
+        if let Some((texture_map, threshold_pos)) = future::block_on(future::poll_once(&mut task.0))
+        {
+            world_texture_manager
+                .cached_texture_maps
+                .insert(threshold_pos, texture_map.clone());
+
             request_chunk_rerender_event_writer.send(RequestChunkRender {
                 texture_map,
-                world_position: world_pos,
+                world_position: threshold_pos.to_translation().set_z_to_chunk_z(),
             });
 
             commands.entity(task_entity).despawn();

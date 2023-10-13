@@ -4,7 +4,7 @@ use self::{
     events::RequestTextureMap,
     resources::WorldGenerationManager,
     systems::{
-        generate_texture_maps, handle_texture_map_generation_task, spawn_chunk,
+        generate_texture_for_chunk, handle_texture_map_generation_task, spawn_chunk,
         update_chunk_from_target,
     },
 };
@@ -28,7 +28,7 @@ impl Plugin for WorldGenerationPlugin {
             .add_systems(
                 Update,
                 (
-                    generate_texture_maps,
+                    generate_texture_for_chunk,
                     handle_texture_map_generation_task,
                     update_chunk_from_target,
                 )

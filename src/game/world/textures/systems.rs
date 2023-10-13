@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::tiles::{TilePos, TileStorage, TileTextureIndex};
 
 use crate::game::world::biomes::resources::BiomeManager;
+use crate::game::world::generation::resources::WorldGenerationManager;
 use crate::game::world::helpers::adjust_translation_for_chunk;
 use crate::game::world::states::WorldState;
 use crate::game::world::textures::helpers::generate_texture_atlas;
@@ -11,8 +12,10 @@ use crate::game::world::{
 };
 use crate::math::map::ValueMap2D;
 
+use super::resources::WorldTextureManager;
+
 pub fn pack_textures(biome_manager: Res<BiomeManager>, mut commands: Commands) {
-    info!("Textures packed into one map");
+    info!("Texture atlas created");
     generate_texture_atlas(&biome_manager.loaded);
 
     commands.insert_resource(NextState(Some(WorldState::Created)));
@@ -26,10 +29,11 @@ pub fn handle_chunk_rerender(
 ) {
     for event in request_chunk_rerender_reader.iter() {
         if let Some(chunk_entity) = world_manager.chunk_entity {
-            let texture_map = &event.texture_map;
-            let translation = adjust_translation_for_chunk(event.world_position);
-
             if let Ok((tile_storage, mut transform)) = chunk_query.get_mut(chunk_entity) {
+                let texture_map = &event.texture_map;
+                let translation = adjust_translation_for_chunk(event.world_position);
+
+                // Updates all the tiles in the tile storage
                 for tile_entity in tile_storage.iter() {
                     let tile_entity = tile_entity.unwrap();
 
@@ -44,6 +48,7 @@ pub fn handle_chunk_rerender(
                     }
                 }
 
+                // Update the position of the chunk
                 transform.translation = translation;
             }
         }

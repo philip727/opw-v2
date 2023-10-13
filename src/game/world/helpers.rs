@@ -30,7 +30,7 @@ pub struct WorldPos {
     pub y: f32,
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Debug, Hash)]
 pub struct ThresholdPos {
     pub x: i32,
     pub y: i32,
