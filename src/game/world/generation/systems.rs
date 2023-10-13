@@ -4,18 +4,23 @@ use futures_lite::future;
 use crate::{
     game::world::{
         biomes::resources::BiomeManager,
-        helpers::{IntoChunkPos, IntoTranslation, IntoWorldPos},
+        helpers::{
+            adjust_translation_for_chunk, IntoChunkPos, IntoThresholdPos, IntoTranslation,
+            IntoWorldPos, SetZToChunkZ, ThresholdPos,
+        },
         resources::WorldManager,
-        textures::helpers::{HeightMap, TextureMap}, ruletile::helpers::RuletileMap,
+        ruletile::helpers::RuletileMap,
+        textures::helpers::{HeightMap, TextureMap},
     },
     math::{map::ValueMap2D, noise::generate_perlin_noise},
 };
 
 use super::{
-    components::ComputeTextureMap,
+    components::{ChunkTarget, ComputeTextureMap},
     constants::*,
     events::{RequestChunkRender, RequestTextureMap},
     helpers::{create_chunk_tilemap, HeightNoiseMap, PrecipitationNoiseMap, TemperatureNoiseMap},
+    resources::WorldGenerationManager,
 };
 
 pub fn spawn_chunk(
@@ -25,17 +30,34 @@ pub fn spawn_chunk(
     mut request_texture_map_event_writer: EventWriter<RequestTextureMap>,
 ) {
     println!("Main chunk spawned");
-    let start_pos = Vec2 { x: 0.0, y: 0.0 };
-    let chunk_pos = start_pos.to_chunk_pos();
+    let chunk_pos = ThresholdPos { x: 0, y: 0 };
 
     let chunk_entity = create_chunk_tilemap(&mut commands, &asset_server, &chunk_pos);
     world_manager.chunk_entity = Some(chunk_entity);
 
     request_texture_map_event_writer.send(RequestTextureMap {
-        world_position: chunk_pos.to_translation().to_world_pos(),
+        threshold_pos: chunk_pos,
     });
 }
 
+pub fn update_chunk_from_target(
+    mut world_gen_manager: ResMut<WorldGenerationManager>,
+    mut request_texture_map_event_writer: EventWriter<RequestTextureMap>,
+    target_query: Query<&Transform, With<ChunkTarget>>,
+) {
+    let target = target_query.single();
+    let target_threshold_pos = target.translation.to_threshold_pos();
+    if world_gen_manager.last_update_pos == target_threshold_pos {
+        return;
+    }
+
+    info!("Update chunk position");
+    // Moves the chunk to the right position
+    world_gen_manager.last_update_pos = target_threshold_pos;
+    request_texture_map_event_writer.send(RequestTextureMap {
+        threshold_pos: target_threshold_pos
+    });
+}
 
 pub fn generate_texture_maps(
     mut commands: Commands,
@@ -47,15 +69,16 @@ pub fn generate_texture_maps(
 
     for event in noise_map_events {
         let thread_pool = AsyncComputeTaskPool::get();
-        let chunk_world_pos = event.world_position.clone();
+        let threshold_pos = event.threshold_pos.clone();
+        let world_pos = event.threshold_pos.clone().to_translation().to_world_pos();
         let biome_manager = biome_manager.clone();
         info!("Generating new texture map");
 
         // Moves the noise generation on to a seperate thread
         let task = thread_pool.spawn(async move {
             let height_noise_map = HeightNoiseMap(generate_perlin_noise(
-                chunk_world_pos.x as i32,
-                chunk_world_pos.y as i32,
+                world_pos.x as i32,
+                world_pos.y as i32,
                 seed,
                 HEIGHT_OFFSET,
                 HEIGHT_OCTAVES,
@@ -65,8 +88,8 @@ pub fn generate_texture_maps(
             ));
 
             let temperature_noise_map = TemperatureNoiseMap(generate_perlin_noise(
-                chunk_world_pos.x as i32,
-                chunk_world_pos.y as i32,
+                world_pos.x as i32,
+                world_pos.y as i32,
                 seed,
                 TEMPERATURE_OFFSET,
                 TEMPERATURE_OCTAVES,
@@ -76,8 +99,8 @@ pub fn generate_texture_maps(
             ));
 
             let precipitation_noise_map = PrecipitationNoiseMap(generate_perlin_noise(
-                chunk_world_pos.x as i32,
-                chunk_world_pos.y as i32,
+                world_pos.x as i32,
+                world_pos.y as i32,
                 seed,
                 PRECIPITATION_OFFSET,
                 PRECIPITATION_OCTAVES,
@@ -98,9 +121,8 @@ pub fn generate_texture_maps(
                 &biome_manager,
             );
 
-
             info!("Finished texture map");
-            (texture_map, chunk_world_pos)
+            (texture_map, threshold_pos.to_translation().set_z_to_chunk_z())
         });
 
         commands

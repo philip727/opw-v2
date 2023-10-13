@@ -2,9 +2,17 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use noise::utils::NoiseMap;
 
-use crate::game::world::{helpers::{ChunkPos, IntoTranslation, SetZToChunkZ}, textures::constants::ASSET_TEXTURE_ATLAS_PATH};
+use crate::game::world::{
+    helpers::{
+        adjust_translation_for_chunk, ChunkPos, IntoTranslation, SetZToChunkZ, ThresholdPos,
+    },
+    textures::constants::ASSET_TEXTURE_ATLAS_PATH,
+};
 
-use super::{constants::{CHUNK_SIZE, TILE_SIZE}, components::Chunk};
+use super::{
+    components::Chunk,
+    constants::{CHUNK_SIZE, TILE_SIZE},
+};
 
 #[repr(transparent)]
 pub struct HeightNoiseMap(pub NoiseMap);
@@ -19,7 +27,7 @@ pub struct PrecipitationNoiseMap(pub NoiseMap);
 pub fn create_chunk_tilemap(
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
-    chunk_pos: &ChunkPos,
+    threshold_pos: &ThresholdPos,
 ) -> Entity {
     let tilemap_entity = commands.spawn_empty().id();
     let tilemap_size = TilemapSize {
@@ -28,7 +36,6 @@ pub fn create_chunk_tilemap(
     };
 
     let mut tile_storage = TileStorage::empty(tilemap_size);
-
     for x in 0..CHUNK_SIZE {
         for y in 0..CHUNK_SIZE {
             let tile_pos = TilePos { x, y };
@@ -47,12 +54,8 @@ pub fn create_chunk_tilemap(
     }
 
     // Place the chunk at the center rather than from the bottom left
-    let chunk_translation = chunk_pos.to_translation().set_z_to_chunk_z()
-        - Vec3 {
-            x: (CHUNK_SIZE as f32 * TILE_SIZE) / 2.0f32,
-            y: (CHUNK_SIZE as f32 * TILE_SIZE) / 2.0f32,
-            z: 0.0f32,
-        };
+    let chunk_translation =
+        adjust_translation_for_chunk(threshold_pos.to_translation().set_z_to_chunk_z());
 
     let chunk_transform = Transform::from_translation(chunk_translation);
     let tile_size = TilemapTileSize {
@@ -80,7 +83,7 @@ pub fn create_chunk_tilemap(
                 transform: chunk_transform,
                 ..Default::default()
             },
-            Chunk
+            Chunk,
         ))
         .id()
 }
