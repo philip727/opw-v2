@@ -51,22 +51,22 @@ pub struct BiomeTiles {
     pub bottom_right: TileTextureData,
 }
 
+pub type TileId = String;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct TileTextureData {
+    pub id: TileId,
     pub style: TileStyle,
     pub textures: Vec<u8>,
     pub animation_length: f32,
-    index: usize,
-
 }
 
 impl TileTextureData {
     pub fn new() -> TileTextureData {
         TileTextureData {
+            id: String::new(),
             style: TileStyle::Single,
             textures: Vec::new(),
             animation_length: 1.0f32,
-            index: 0,
         }
     }
 
@@ -76,24 +76,6 @@ impl TileTextureData {
             TileStyle::Animated => self.textures[0],
             TileStyle::Random => self.textures[0],
         }
-    }
-}
-
-impl Iterator for TileTextureData {
-    type Item = u8;
-
-    // Iterates over each tile texture
-    fn next(&mut self) -> Option<Self::Item> {
-        let item = self.textures[self.index];
-        info!("{}", item);
-        if self.index >= self.textures.len() - 1 {
-            self.index = 0;
-            return None;
-        } else {
-            self.index += 1
-        };
-
-        Some(item)
     }
 }
 

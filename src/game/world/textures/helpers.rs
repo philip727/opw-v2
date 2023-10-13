@@ -22,7 +22,6 @@ use super::constants::{
     FILLED_HEIGHT, NEIGHBOURS_TO_CHECK, NON_FILLED_HEIGHT, REQUIRED_NEIGHBOURS,
 };
 
-pub type BiomeId = String;
 #[derive(Clone, Debug)]
 pub struct HeightMap {
     pub size: (usize, usize),

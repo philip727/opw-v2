@@ -44,6 +44,7 @@ pub fn handle_chunk_rerender(
                     if let Some((biome_offset, data)) = texture_index {
                         // Clones the data so we can animate and do things with tiles
                         tile_properties.data = data.clone();
+                        tile_properties.biome_offset = biome_offset;
 
                         *tile_texture_index =
                             TileTextureIndex(biome_offset + data.get_offset() as u32);

@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 
 use self::{
-    animations::systems::handle_tile_animations,
+    animations::{
+        resources::TileAnimationManager,
+        systems::{handle_animated_tiles, handle_synced_animations},
+    },
     resources::WorldTextureManager,
     systems::{handle_chunk_rerender, pack_textures},
 };
@@ -20,10 +23,15 @@ impl Plugin for WorldTexturePlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<RequestChunkRender>()
             .init_resource::<WorldTextureManager>()
+            .init_resource::<TileAnimationManager>()
             .add_systems(OnEnter(WorldState::GenerateTextureMap), pack_textures)
             .add_systems(
                 Update,
-                (handle_chunk_rerender, handle_tile_animations)
+                (
+                    handle_chunk_rerender,
+                    handle_synced_animations,
+                    handle_animated_tiles,
+                )
                     .run_if(in_state(WorldState::Created)),
             );
     }

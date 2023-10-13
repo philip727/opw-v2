@@ -8,14 +8,15 @@
         },
         "tiles": {
             "water": {
-                "style": "Animated",
+                "id": "grassland:water",
+                "style": "Single",
                 "textures": [
-                    13, 0, 2
+                    22
                 ],
-                "animation_length": 2.0,
-                "index": 0
+                "animation_length": 2.0
             },
             "top_left": {
+                "id": "grassland:top_left",
                 "style": "Single",
                 "textures": [
                     0
@@ -24,6 +25,7 @@
                 "index": 0
             },
             "top_middle": {
+                "id": "grassland:top_middle",
                 "style": "Single",
                 "textures": [
                     1
@@ -32,6 +34,7 @@
                 "index": 0
             },
             "top_right": {
+                "id": "grassland:top_right",
                 "style": "Single",
                 "textures": [
                     2
@@ -40,6 +43,7 @@
                 "index": 0
             },
             "middle": {
+                "id": "grassland:middle",
                 "style": "Single",
                 "textures": [
                     3
@@ -48,6 +52,7 @@
                 "index": 0
             },
             "middle_left": {
+                "id": "grassland:middle_left",
                 "style": "Single",
                 "textures": [
                     4
@@ -56,6 +61,7 @@
                 "index": 0
             },
             "middle_right": {
+                "id": "grassland:middle_right",
                 "style": "Single",
                 "textures": [
                     5
@@ -64,6 +70,7 @@
                 "index": 0
             },
             "down_right": {
+                "id": "grassland:down_right",
                 "style": "Single",
                 "textures": [
                     6
@@ -72,6 +79,7 @@
                 "index": 0
             },
             "down_left": {
+                "id": "grassland:down_left",
                 "style": "Single",
                 "textures": [
                     7
@@ -80,6 +88,7 @@
                 "index": 0
             },
             "up_right": {
+                "id": "grassland:up_right",
                 "style": "Single",
                 "textures": [
                     8
@@ -88,6 +97,7 @@
                 "index": 0
             },
             "up_left": {
+                "id": "grassland:up_left",
                 "style": "Single",
                 "textures": [
                     9
@@ -96,27 +106,45 @@
                 "index": 0
             },
             "bottom_left": {
-                "style": "Single",
+                "id": "grassland:bottom_left",
+                "style": "Animated",
                 "textures": [
-                    10
+                    10,
+                    11,
+                    12,
+                    13,
+                    12,
+                    11
                 ],
-                "animation_length": 1.0,
+                "animation_length": 2.0,
                 "index": 0
             },
             "bottom_middle": {
-                "style": "Single",
+                "id": "grassland:bottom_middle",
+                "style": "Animated",
                 "textures": [
-                    11
+                    14,
+                    15,
+                    16,
+                    17,
+                    16,
+                    15
                 ],
-                "animation_length": 1.0,
+                "animation_length": 2.0,
                 "index": 0
             },
             "bottom_right": {
-                "style": "Single",
+                "id": "grassland:bottom_right",
+                "style": "Animated",
                 "textures": [
-                    12
+                    18,
+                    19,
+                    20,
+                    21,
+                    20,
+                    19
                 ],
-                "animation_length": 1.0,
+                "animation_length": 2.0,
                 "index": 0
             }
         }
@@ -130,116 +158,116 @@
         },
         "tiles": {
             "water": {
+                "id": "snowy_tundra:water",
                 "style": "Single",
                 "textures": [
                     13
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "top_left": {
+                "id": "snowy_tundra:top_left",
                 "style": "Single",
                 "textures": [
                     0
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "top_middle": {
+                "id": "snowy_tundra:top_middle",
                 "style": "Single",
                 "textures": [
                     1
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "top_right": {
+                "id": "snowy_tundra:top_right",
                 "style": "Single",
                 "textures": [
                     2
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "middle": {
+                "id": "snowy_tundra:middle",
                 "style": "Single",
                 "textures": [
                     3
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "middle_left": {
+                "id": "snowy_tundra:middle_left",
                 "style": "Single",
                 "textures": [
                     4
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "middle_right": {
+                "id": "snowy_tundra:middle_right",
                 "style": "Single",
                 "textures": [
                     5
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "down_right": {
+                "id": "snowy_tundra:down_right",
                 "style": "Single",
                 "textures": [
                     6
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "down_left": {
+                "id": "snowy_tundra:down_left",
                 "style": "Single",
                 "textures": [
                     7
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "up_right": {
+                "id": "snowy_tundra:up_right",
                 "style": "Single",
                 "textures": [
                     8
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "up_left": {
+                "id": "snowy_tundra:up_left",
                 "style": "Single",
                 "textures": [
                     9
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "bottom_left": {
+                "id": "snowy_tundra:bottom_left",
                 "style": "Single",
                 "textures": [
                     10
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "bottom_middle": {
+                "id": "snowy_tundra:bottom_middle",
                 "style": "Single",
                 "textures": [
                     11
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "bottom_right": {
+                "id": "snowy_tundra:bottom_right",
                 "style": "Single",
                 "textures": [
                     12
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             }
         }
     },
@@ -252,6 +280,7 @@
         },
         "tiles": {
             "water": {
+                "id": "sandy_plains:water",
                 "style": "Single",
                 "textures": [
                     13
@@ -260,108 +289,108 @@
                 "index": 0
             },
             "top_left": {
+                "id": "sandy_plains:top_left",
                 "style": "Single",
                 "textures": [
                     0
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "top_middle": {
+                "id": "sandy_plains:top_middle",
                 "style": "Single",
                 "textures": [
                     1
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "top_right": {
+                "id": "sandy_plains:top_right",
                 "style": "Single",
                 "textures": [
                     2
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "middle": {
+                "id": "sandy_plains:middle",
                 "style": "Single",
                 "textures": [
                     3
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "middle_left": {
+                "id": "sandy_plains:middle_left",
                 "style": "Single",
                 "textures": [
                     4
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "middle_right": {
+                "id": "sandy_plains:middle_right",
                 "style": "Single",
                 "textures": [
                     5
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "down_right": {
+                "id": "sandy_plains:down_right",
                 "style": "Single",
                 "textures": [
                     6
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "down_left": {
+                "id": "sandy_plains:down_left",
                 "style": "Single",
                 "textures": [
                     7
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "up_right": {
+                "id": "sandy_plains:up_right",
                 "style": "Single",
                 "textures": [
                     8
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "up_left": {
+                "id": "sandy_plains:up_left",
                 "style": "Single",
                 "textures": [
                     9
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "bottom_left": {
+                "id": "sandy_plains:bottom_left",
                 "style": "Single",
                 "textures": [
                     10
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "bottom_middle": {
+                "id": "sandy_plains:bottom_middle",
                 "style": "Single",
                 "textures": [
                     11
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "bottom_right": {
+                "id": "sandy_plains:bottom_right",
                 "style": "Single",
                 "textures": [
                     12
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             }
         }
     }

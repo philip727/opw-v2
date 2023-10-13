@@ -6,20 +6,7 @@ use crate::game::world::biomes::helpers::TileTextureData;
 pub struct TileProperties {
     pub collidable: bool,
     pub data: TileTextureData,
-    last_frame_time: f32,
-}
-
-impl TileProperties {
-    pub fn update_animation_time(&mut self, add: f32, time_between_frame: f32) -> bool {
-        self.last_frame_time += add;
-
-        if self.last_frame_time > time_between_frame {
-            self.last_frame_time = 0.0;
-            return true;
-        }
-
-        false
-    }
+    pub biome_offset: u32,
 }
 
 impl Default for TileProperties {
@@ -27,7 +14,7 @@ impl Default for TileProperties {
         TileProperties {
             collidable: false,
             data: TileTextureData::new(),
-            last_frame_time: 0.0f32,
+            biome_offset: 0,
         }
     }
 }

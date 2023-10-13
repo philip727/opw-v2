@@ -1,24 +1,73 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::tiles::TileTextureIndex;
 
-use crate::game::world::{biomes::helpers::TileStyle, collisions::components::TileProperties};
+use crate::game::world::{
+    biomes::helpers::{BiomeId, TileStyle},
+    collisions::components::TileProperties,
+};
 
-pub fn handle_tile_animations(
-    mut tile_query: Query<(&mut TileProperties, &mut TileTextureIndex)>,
+use super::resources::{SyncedTileAnimation, TileAnimationManager};
+
+// Handles syncing all the animations
+pub fn handle_synced_animations(
+    mut tile_query: Query<&mut TileProperties>,
+    mut tile_animation_manager: ResMut<TileAnimationManager>,
     time: Res<Time>,
 ) {
-    for (mut properties, mut texture_index) in tile_query.iter_mut() {
+    let mut handle_animations: Vec<BiomeId> = Vec::new();
+
+    for properties in tile_query.iter_mut() {
         if properties.data.style != TileStyle::Animated {
             continue;
         }
 
-        let time_between_frames =
-            properties.data.animation_length / properties.data.textures.len() as f32;
+        // If the tile hasn't been synced yet, then we must set it up
+        if let None = tile_animation_manager
+            .synced_animations
+            .get(&properties.data.id)
+        {
+            tile_animation_manager.synced_animations.insert(
+                properties.data.id.clone(),
+                SyncedTileAnimation {
+                    currrent_index: 0,
+                    texture_length: properties.data.textures.len(),
+                    current_time: 0.0,
+                    animation_length: properties.data.animation_length,
+                },
+            );
+        }
 
-        if properties.update_animation_time(time.delta_seconds(), time_between_frames) {
-            if let Some(new_index) = properties.data.next() {
-                *texture_index = TileTextureIndex(new_index as u32);
-            }
+        // Gets all the ids we need to handle at the moment
+        if handle_animations.contains(&properties.data.id) {
+            continue;
+        }
+
+        handle_animations.push(properties.data.id.clone());
+    }
+
+    // Updates all the synced animations
+    for id in handle_animations {
+        tile_animation_manager.update_synced_tile(&id, time.delta_seconds());
+    }
+}
+
+// Sets the texture of each synced animation
+pub fn handle_animated_tiles(
+    mut tile_query: Query<(&TileProperties, &mut TileTextureIndex)>,
+    tile_animation_manager: Res<TileAnimationManager>,
+) {
+    for (properties, mut texture_index) in tile_query.iter_mut() {
+        if properties.data.style != TileStyle::Animated {
+            continue;
+        }
+        if let Some(synced_animation) = tile_animation_manager
+            .synced_animations
+            .get(&properties.data.id)
+        {
+            *texture_index = TileTextureIndex(
+                properties.biome_offset
+                    + properties.data.textures[synced_animation.currrent_index] as u32,
+            );
         }
     }
 }
