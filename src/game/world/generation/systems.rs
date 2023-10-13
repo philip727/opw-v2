@@ -4,10 +4,7 @@ use futures_lite::future;
 use crate::{
     game::world::{
         biomes::resources::BiomeManager,
-        helpers::{
-            adjust_translation_for_chunk, IntoChunkPos, IntoThresholdPos, IntoTranslation,
-            IntoWorldPos, SetZToChunkZ, ThresholdPos,
-        },
+        helpers::{IntoThresholdPos, IntoTranslation, IntoWorldPos, SetZToChunkZ, ThresholdPos},
         resources::WorldManager,
         ruletile::helpers::RuletileMap,
         textures::{
@@ -15,7 +12,7 @@ use crate::{
             resources::WorldTextureManager,
         },
     },
-    math::{map::ValueMap2D, noise::generate_perlin_noise},
+    math::noise::generate_perlin_noise,
 };
 
 use super::{
@@ -32,9 +29,9 @@ pub fn spawn_chunk(
     mut world_manager: ResMut<WorldManager>,
     mut request_texture_map_event_writer: EventWriter<RequestTextureMap>,
 ) {
-    println!("Main chunk spawned");
-    let chunk_pos = ThresholdPos { x: 0, y: 0 };
+    info!("Main chunk spawned");
 
+    let chunk_pos = ThresholdPos { x: 0, y: 0 };
     let chunk_entity = create_chunk_tilemap(&mut commands, &asset_server, &chunk_pos);
     world_manager.chunk_entity = Some(chunk_entity);
 
@@ -82,6 +79,7 @@ pub fn generate_texture_for_chunk(
 
         // Moves the noise generation on to a seperate thread
         let task = thread_pool.spawn(async move {
+            // Checks for a cached map and saves generating the perlin noise
             if let Some(texture_map) = cached_maps.get(&threshold_pos) {
                 return (texture_map.clone(), threshold_pos);
             }
@@ -119,9 +117,14 @@ pub fn generate_texture_for_chunk(
                 PRECIPITATION_FREQUENCY / PRECIPITATION_SCALE,
             ));
 
+            // Generates the height based on the height and precipiation, this is so that in low
+            // precipitation areas we dont have much water, like the sand biome
             let mut height_map = HeightMap::generate(&height_noise_map, &precipitation_noise_map);
+            // Smoothens the map a few time to make sure there are no single tiles
             height_map.smoothen_height_map(Some(3));
+            // Determines what tiles need to go at what coord
             let ruletile_map = RuletileMap::generate(&height_map);
+            // Finds the textures based on biome and ruletile
             let texture_map = TextureMap::generate(
                 &height_map,
                 &temperature_noise_map,
@@ -149,9 +152,18 @@ pub fn handle_texture_map_generation_task(
     for (task_entity, mut task) in &mut texture_map_tasks {
         if let Some((texture_map, threshold_pos)) = future::block_on(future::poll_once(&mut task.0))
         {
-            world_texture_manager
+            // If the texture map isn't cached, then we need to store it
+            if let None = world_texture_manager
                 .cached_texture_maps
-                .insert(threshold_pos, texture_map.clone());
+                .get(&threshold_pos)
+            {
+                world_texture_manager
+                    .cached_texture_maps
+                    .insert(threshold_pos, texture_map.clone());
+            }
+
+            // This is for colliders and object spawning
+            world_texture_manager.current_texture_map = Some(texture_map.clone());
 
             request_chunk_rerender_event_writer.send(RequestChunkRender {
                 texture_map,

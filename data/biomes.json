@@ -46,5 +46,29 @@
             "bottom_middle": 11,
             "bottom_right": 12
         }
+    },
+    {
+        "id": "biome:sandy_plains",
+        "texture_location": "./assets/tilemaps/sandy.png",
+        "rules": {
+            "precipitation": 0.37,
+            "temperature": 0.95
+        },
+        "tiles": {
+            "water": 13,
+            "top_left": 0,
+            "top_middle": 1,
+            "top_right": 2,
+            "middle": 3,
+            "middle_left": 4,
+            "middle_right": 5,
+            "down_right": 6,
+            "down_left": 7,
+            "up_right": 8,
+            "up_left": 9,
+            "bottom_left": 10,
+            "bottom_middle": 11,
+            "bottom_right": 12
+        }
     }
 ]

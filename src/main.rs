@@ -3,7 +3,7 @@ pub mod math;
 
 use bevy::{
     prelude::*,
-    window::{PresentMode, WindowLevel, WindowMode},
+    window::*,
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use game::GamePlugins;
@@ -15,11 +15,12 @@ fn main() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        mode: WindowMode::Fullscreen,
+                        mode: WindowMode::Windowed,
                         title: "ow-sb-v2".into(),
                         resizable: true,
                         present_mode: PresentMode::AutoVsync,
                         window_level: WindowLevel::Normal,
+                        resolution: WindowResolution::new(1920.0, 1080.0), 
                         ..Default::default()
                     }),
                     ..Default::default()

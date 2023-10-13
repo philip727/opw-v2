@@ -6,7 +6,7 @@ use image::io::Reader as ImageReader;
 use super::{helpers::load_biome_data, resources::BiomeManager};
 
 pub fn setup_biome_data(mut biome_manager: ResMut<BiomeManager>, mut commands: Commands) {
-    println!("Biome data loaded");
+    info!("Biome data loaded");
     let tile_size_u32 = TILE_SIZE as u32;
     let biome_data = load_biome_data();
 

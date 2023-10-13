@@ -18,7 +18,7 @@ use crate::{
     math::map::ValueMap2D,
 };
 
-use super::constants::{FILLED_HEIGHT, NEIGHBOURS_TO_CHECK, NON_FILLED_HEIGHT};
+use super::constants::{FILLED_HEIGHT, NEIGHBOURS_TO_CHECK, NON_FILLED_HEIGHT, REQUIRED_NEIGHBOURS};
 
 pub type BiomeId = String;
 #[derive(Clone, Debug)]
@@ -170,7 +170,7 @@ impl HeightMap {
                     }
 
                     // If the tile only has 1 or less neighbours then we need to make it a lower height
-                    if neighbour_count < 2 {
+                    if neighbour_count < REQUIRED_NEIGHBOURS {
                         self.set_value(x, y, NON_FILLED_HEIGHT);
                     }
                 }
