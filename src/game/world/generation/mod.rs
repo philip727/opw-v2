@@ -4,8 +4,8 @@ use self::{
     events::RequestTextureMap,
     resources::WorldGenerationManager,
     systems::{
-        generate_texture_for_chunk, handle_texture_map_generation_task, spawn_chunk,
-        update_chunk_from_target,
+        generate_texture_for_chunk, handle_texture_map_generation_task, setup_world_gen,
+        spawn_chunk, update_chunk_from_target,
     },
 };
 
@@ -24,7 +24,7 @@ impl Plugin for WorldGenerationPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<WorldGenerationManager>()
             .add_event::<RequestTextureMap>()
-            .add_systems(OnEnter(WorldState::Created), spawn_chunk)
+            .add_systems(OnEnter(WorldState::Created), (setup_world_gen, spawn_chunk))
             .add_systems(
                 Update,
                 (

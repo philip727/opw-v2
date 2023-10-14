@@ -16,6 +16,7 @@ use super::{
 
 pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
+        Name::new("Player"),
         SpriteBundle {
             texture: asset_server.load("player/skins/default/default.png"),
             transform: Transform::from_xyz(0.0, 0.0, PLAYER_POS_Z),

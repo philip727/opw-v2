@@ -1,5 +1,6 @@
 use bevy::{prelude::*, tasks::AsyncComputeTaskPool};
 use futures_lite::future;
+use rand::{rngs::StdRng, SeedableRng};
 
 use crate::{
     game::world::{
@@ -23,6 +24,11 @@ use super::{
     helpers::{create_chunk_tilemap, HeightNoiseMap, PrecipitationNoiseMap, TemperatureNoiseMap},
     resources::WorldGenerationManager,
 };
+
+pub fn setup_world_gen(mut world_gen_manager: ResMut<WorldGenerationManager>) {
+    world_gen_manager.seed = SEED;
+    world_gen_manager.rng = Some(StdRng::seed_from_u64(world_gen_manager.seed as u64))
+}
 
 pub fn spawn_chunk(
     mut commands: Commands,
@@ -60,14 +66,15 @@ pub fn update_chunk_from_target(
     });
 }
 
+const SEED: u32 = 1203;
 pub fn generate_texture_for_chunk(
     mut commands: Commands,
     mut request_texture_map_event_reader: EventReader<RequestTextureMap>,
     world_texture_manager: Res<WorldTextureManager>,
     world_collsion_manager: Res<WorldCollisionManager>,
+    world_generation_manager: Res<WorldGenerationManager>,
     biome_manager: Res<BiomeManager>,
 ) {
-    let seed = 1203;
     let noise_map_events: Vec<_> = request_texture_map_event_reader.iter().cloned().collect();
 
     for event in noise_map_events {
@@ -79,6 +86,7 @@ pub fn generate_texture_for_chunk(
         let cached_textures = world_texture_manager.cached_texture_maps.clone();
         let cached_ruletiles = world_collsion_manager.cached_ruletile_maps.clone();
         let biome_manager = biome_manager.clone();
+        let seed = world_generation_manager.seed.clone();
 
         // Moves the noise generation on to a seperate thread
         let task = thread_pool.spawn(async move {

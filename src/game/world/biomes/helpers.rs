@@ -74,12 +74,8 @@ impl TileTextureData {
         }
     }
 
-    pub fn get_offset(&self) -> u8 {
-        match self.style {
-            TileStyle::Single => self.textures[0],
-            TileStyle::Animated => self.textures[0],
-            TileStyle::Random => self.textures[0],
-        }
+    pub fn get_first_texture(&self) -> u8 {
+        self.textures[0]
     }
 }
 
@@ -91,6 +87,7 @@ pub enum TileStyle {
 }
 
 impl BiomeData {
+    /// Loads all the biomes from [BIOMES_DIR_PATH]
     pub fn load_biomes() -> anyhow::Result<Vec<Self>> {
         let mut biomes: Vec<_> = vec![];
 
@@ -118,6 +115,7 @@ impl BiomeData {
         Ok(biomes)
     }
 
+    /// Loads the biome data from a directory
     fn load_biome_data(path: PathBuf) -> anyhow::Result<BiomeData> {
         let biome_data_path = path.to_str().unwrap().to_owned() + "/data.json";
         let biome_dir_name = path.file_name().unwrap().to_str().unwrap().to_owned();
@@ -138,6 +136,7 @@ impl BiomeData {
     }
 }
 
+/// Finds the best biome using euclidian
 pub fn determine_best_biome<'manager>(
     precipitation: f32,
     temperature: f32,
