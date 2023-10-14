@@ -1,14 +1,16 @@
 use bevy::prelude::*;
 
-use crate::game::world::{generation::constants::TILE_SIZE, states::WorldState};
+use crate::game::world::{
+    biomes::helpers::BiomeData, generation::constants::TILE_SIZE, states::WorldState,
+};
 use image::io::Reader as ImageReader;
 
-use super::{helpers::load_biome_data, resources::BiomeManager};
+use super::resources::BiomeManager;
 
 pub fn setup_biome_data(mut biome_manager: ResMut<BiomeManager>, mut commands: Commands) {
     info!("Biome data loaded");
     let tile_size_u32 = TILE_SIZE as u32;
-    let biome_data = load_biome_data();
+    let biome_data = BiomeData::load_biomes().unwrap();
 
     // Creates the offset for each tilemap by id
     let mut tile_offset = 0u32;

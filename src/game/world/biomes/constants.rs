@@ -9,3 +9,5 @@ pub const BIOMES_DATA_DEFAULT: &'static str = r#"[
         "texture_location": "assets/tilemaps/snowy_tundra.png"
     }
 ]"#;
+
+pub const BIOMES_DIR_PATH: &'static str = "./data/biomes/";

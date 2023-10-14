@@ -8,6 +8,7 @@ pub mod constants;
 pub mod helpers;
 pub mod resources;
 pub mod systems;
+pub mod errors;
 
 pub struct WorldBiomePlugin;
 

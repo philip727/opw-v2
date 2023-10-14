@@ -1,0 +1,140 @@
+{
+    "id": "biome:grasslands",
+    "texture_location": "./assets/tilemaps/grasslands.png",
+    "rules": {
+        "precipitation": 0.57,
+        "temperature": 0.51
+    },
+    "tiles": {
+        "water": {
+            "id": "tile:grasslands:water",
+            "style": "Single",
+            "textures": [
+                22
+            ],
+            "animation_length": 2.0
+        },
+        "top_left": {
+            "id": "tile:grasslands:top_left",
+            "style": "Single",
+            "textures": [
+                0
+            ],
+            "animation_length": 1.0
+        },
+        "top_middle": {
+            "id": "tile:grasslands:top_middle",
+            "style": "Single",
+            "textures": [
+                1
+            ],
+            "animation_length": 1.0
+        },
+        "top_right": {
+            "id": "tile:grasslands:top_right",
+            "style": "Single",
+            "textures": [
+                2
+            ],
+            "animation_length": 1.0
+        },
+        "middle": {
+            "id": "tile:grasslands:middle",
+            "style": "Single",
+            "textures": [
+                3
+            ],
+            "animation_length": 1.0
+        },
+        "middle_left": {
+            "id": "tile:grasslands:middle_left",
+            "style": "Single",
+            "textures": [
+                4
+            ],
+            "animation_length": 1.0
+        },
+        "middle_right": {
+            "id": "tile:grasslands:middle_right",
+            "style": "Single",
+            "textures": [
+                5
+            ],
+            "animation_length": 1.0
+        },
+        "down_right": {
+            "id": "tile:grasslands:down_right",
+            "style": "Single",
+            "textures": [
+                6
+            ],
+            "animation_length": 1.0
+        },
+        "down_left": {
+            "id": "tile:grasslands:down_left",
+            "style": "Single",
+            "textures": [
+                7
+            ],
+            "animation_length": 1.0
+        },
+        "up_right": {
+            "id": "tile:grasslands:up_right",
+            "style": "Single",
+            "textures": [
+                8
+            ],
+            "animation_length": 1.0
+        },
+        "up_left": {
+            "id": "tile:grasslands:up_left",
+            "style": "Single",
+            "textures": [
+                9
+            ],
+            "animation_length": 1.0
+        },
+        "bottom_left": {
+            "id": "tile:grasslands:bottom_left",
+            "sync_group_id": "sync_group:water",
+            "style": "Animated",
+            "textures": [
+                10,
+                11,
+                12,
+                13,
+                12,
+                11
+            ],
+            "animation_length": 2.0
+        },
+        "bottom_middle": {
+            "id": "tile:grasslands:bottom_middle",
+            "sync_group_id": "sync_group:water",
+            "style": "Animated",
+            "textures": [
+                14,
+                15,
+                16,
+                17,
+                16,
+                15
+            ],
+            "animation_length": 2.0
+        },
+        "bottom_right": {
+            "id": "tile:grasslands:bottom_right",
+            "sync_group_id": "sync_group:water",
+            "style": "Animated",
+            "textures": [
+                18,
+                19,
+                20,
+                21,
+                20,
+                19
+            ],
+            "animation_length": 2.0
+        }
+    }
+}

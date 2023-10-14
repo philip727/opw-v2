@@ -84,8 +84,7 @@
                 "textures": [
                     7
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "up_right": {
                 "id": "grassland:up_right",
@@ -93,8 +92,7 @@
                 "textures": [
                     8
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "up_left": {
                 "id": "grassland:up_left",
@@ -102,8 +100,7 @@
                 "textures": [
                     9
                 ],
-                "animation_length": 1.0,
-                "index": 0
+                "animation_length": 1.0
             },
             "bottom_left": {
                 "id": "grassland:bottom_left",
@@ -116,8 +113,7 @@
                     12,
                     11
                 ],
-                "animation_length": 2.0,
-                "index": 0
+                "animation_length": 2.0
             },
             "bottom_middle": {
                 "id": "grassland:bottom_middle",
@@ -130,8 +126,7 @@
                     16,
                     15
                 ],
-                "animation_length": 2.0,
-                "index": 0
+                "animation_length": 2.0
             },
             "bottom_right": {
                 "id": "grassland:bottom_right",
@@ -144,8 +139,7 @@
                     20,
                     19
                 ],
-                "animation_length": 2.0,
-                "index": 0
+                "animation_length": 2.0
             }
         }
     },
@@ -161,7 +155,7 @@
                 "id": "snowy_tundra:water",
                 "style": "Single",
                 "textures": [
-                    13
+                    22
                 ],
                 "animation_length": 1.0
             },
@@ -247,27 +241,42 @@
             },
             "bottom_left": {
                 "id": "snowy_tundra:bottom_left",
-                "style": "Single",
+                "style": "Animated",
                 "textures": [
-                    10
+                    10,
+                    11,
+                    12,
+                    13,
+                    12,
+                    11
                 ],
-                "animation_length": 1.0
+                "animation_length": 2.0
             },
             "bottom_middle": {
                 "id": "snowy_tundra:bottom_middle",
-                "style": "Single",
+                "style": "Animated",
                 "textures": [
-                    11
+                    14,
+                    15,
+                    16,
+                    17,
+                    16,
+                    15
                 ],
-                "animation_length": 1.0
+                "animation_length": 2.0
             },
             "bottom_right": {
                 "id": "snowy_tundra:bottom_right",
-                "style": "Single",
+                "style": "Animated",
                 "textures": [
-                    12
+                    18,
+                    19,
+                    20,
+                    21,
+                    20,
+                    19
                 ],
-                "animation_length": 1.0
+                "animation_length": 2.0
             }
         }
     },
