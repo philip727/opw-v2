@@ -1,8 +1,11 @@
 use bevy::{app::PluginGroupBuilder, prelude::PluginGroup};
 use bevy_ecs_tilemap::TilemapPlugin;
 
-use self::{camera::CameraPlugin, player::PlayerPlugins, world::WorldPlugins};
+use self::{
+    animation::AnimationPlugin, camera::CameraPlugin, player::PlayerPlugins, world::WorldPlugins,
+};
 
+pub mod animation;
 pub mod camera;
 pub mod player;
 pub mod world;
@@ -17,7 +20,8 @@ impl PluginGroup for GamePlugins {
             .add(TilemapPlugin)
             .add(CameraPlugin)
             .add(WorldPlugins)
-            .add(PlayerPlugins);
+            .add(PlayerPlugins)
+            .add(AnimationPlugin);
 
         group
     }

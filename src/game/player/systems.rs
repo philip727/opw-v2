@@ -1,7 +1,8 @@
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::{prelude::*, utils::HashMap, window::PrimaryWindow};
 use bevy_ecs_tilemap::tiles::TilePos;
 
 use crate::game::{
+    animation::components::AnimationStateMachine,
     camera::components::CameraTarget,
     world::{
         collisions::{components::TileProperties, helpers::colliding_with_wall},
@@ -15,6 +16,8 @@ use super::{
 };
 
 pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let hashmap = HashMap::new();
+
     commands.spawn((
         Name::new("Player"),
         SpriteBundle {
@@ -22,6 +25,7 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
             transform: Transform::from_xyz(0.0, 0.0, PLAYER_POS_Z),
             ..Default::default()
         },
+        AnimationStateMachine::new("Idle".into(), hashmap),
         MovementController::default(),
         DirectionController,
         ChunkTarget,
