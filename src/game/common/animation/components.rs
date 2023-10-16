@@ -38,4 +38,8 @@ impl AnimationStateMachine {
     pub fn add_state(&mut self, state_name: String, animation: AnimationState) {
         self.states.insert(state_name, animation);
     }
+
+    pub fn is_current_state(&self, state_name: String) -> bool {
+        self.current_state == state_name
+    }
 }

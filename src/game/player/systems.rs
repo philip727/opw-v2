@@ -1,18 +1,23 @@
-use bevy::{prelude::*, utils::HashMap, window::PrimaryWindow};
+use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_ecs_tilemap::tiles::TilePos;
 
 use crate::game::{
-    animation::components::AnimationStateMachine,
     camera::components::CameraTarget,
-    entity_skin::helpers::EntitySkin,
+    common::{
+        animation::components::AnimationStateMachine, skin::helpers::EntitySkin,
+        velocity::components::Velocity,
+    },
     world::{
         collisions::{components::TileProperties, helpers::colliding_with_wall},
-        generation::components::{Chunk, ChunkTarget},
+        generation::{
+            components::{Chunk, ChunkTarget},
+            constants::TILE_SIZE,
+        },
     },
 };
 
 use super::{
-    components::{DirectionController, MovementController},
+    components::{DirectionController, MovementController, Player},
     constants::PLAYER_POS_Z,
 };
 
@@ -28,6 +33,7 @@ pub fn spawn_player(
 
     commands.spawn((
         Name::new("Player"),
+        Player,
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             sprite: TextureAtlasSprite::new(0),
@@ -39,6 +45,7 @@ pub fn spawn_player(
         DirectionController,
         ChunkTarget,
         CameraTarget { priority: 1 },
+        Velocity::new(Vec3::new(0.0, 0.0, PLAYER_POS_Z)),
     ));
 }
 
@@ -71,12 +78,22 @@ pub fn manage_movement(
         // Allows us to slide against walls
         let chunk_transform = chunk_query.single();
         let target = transform.translation + Vec3::new(x_delta, 0.0, 0.0);
-        if !colliding_with_wall(target, &tile_query, &chunk_transform) {
+        if !colliding_with_wall(
+            Vec2::splat(TILE_SIZE),
+            target,
+            &tile_query,
+            &chunk_transform,
+        ) {
             direction += Vec3::new(x_delta, 0.0, 0.0);
         }
 
         let target = transform.translation + Vec3::new(0.0, y_delta, 0.0);
-        if !colliding_with_wall(target, &tile_query, &chunk_transform) {
+        if !colliding_with_wall(
+            Vec2::splat(TILE_SIZE),
+            target,
+            &tile_query,
+            &chunk_transform,
+        ) {
             direction += Vec3::new(0.0, y_delta, 0.0);
         }
 
@@ -104,4 +121,30 @@ pub fn manage_direction(
     ) {
         sprite.flip_x = cursor_position.x < screen_position.x;
     }
+}
+
+pub fn manage_state_machine(
+    mut player_query: Query<(&mut AnimationStateMachine, &Velocity), With<Player>>,
+) {
+    let (mut state_machine, velocity) = player_query.single_mut();
+
+    //info!("{}", velocity.displacement.normalize().length());
+
+    if velocity.displacement.normalize().length() > 0.0 {
+        if !state_machine.is_current_state("Run".into()) {
+            state_machine
+                .set_state("Run".into())
+                .expect("Passed in invalid state");
+        }
+
+        return;
+    }
+
+    if state_machine.is_current_state("Idle".into()) {
+        return;
+    }
+
+    state_machine
+        .set_state("Idle".into())
+        .expect("Passed in invalid state");
 }

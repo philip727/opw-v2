@@ -13,3 +13,6 @@ impl Default for MovementController {
         MovementController { speed: 130.0f32 }
     }
 }
+
+#[derive(Component)]
+pub struct Player;

@@ -9,6 +9,7 @@ use crate::game::{
 use super::components::TileProperties;
 
 pub fn colliding_with_wall(
+    target_size: Vec2,
     target_pos: Vec3,
     tile_query: &Query<(&TileProperties, &TilePos)>,
     chunk_transform: &Transform,
@@ -20,7 +21,7 @@ pub fn colliding_with_wall(
 
         let collision = collide(
             target_pos,
-            Vec2::splat(TILE_SIZE),
+            target_size,
             Vec3::new(
                 chunk_transform.translation.x + transform.x as f32 * TILE_SIZE,
                 chunk_transform.translation.y + transform.y as f32 * TILE_SIZE,

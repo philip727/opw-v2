@@ -4,10 +4,7 @@ use std::{fs, path::PathBuf};
 use bevy::{prelude::*, sprite::TextureAtlas, utils::HashMap};
 use serde::{Deserialize, Serialize};
 
-use crate::game::animation::{
-    components::AnimationStateMachine,
-    helpers::{AnimationState, AnimationStateTitle},
-};
+use crate::game::common::animation::{components::AnimationStateMachine, helpers::{AnimationState, AnimationStateTitle}};
 
 pub type EntitySkinId = String;
 #[derive(Serialize, Deserialize, Clone)]

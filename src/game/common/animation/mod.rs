@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
-use self::systems::handle_animation_machines;
+use crate::game::world::states::WorldState;
 
-use super::world::states::WorldState;
+use self::systems::handle_animation_machines;
 
 pub mod components;
 pub mod helpers;
@@ -14,7 +14,7 @@ impl Plugin for AnimationPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            handle_animation_machines.run_if(in_state(WorldState::Created)),
+            handle_animation_machines,
         );
     }
 }
