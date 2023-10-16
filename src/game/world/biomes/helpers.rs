@@ -1,6 +1,5 @@
 use std::{
-    fs::{self, File},
-    io::Write,
+    fs::{self},
     path::{Path, PathBuf},
 };
 
@@ -10,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::math::noise::{euclidian_distance, normalize_noise_value};
 
 use super::{
-    constants::{BIOMES_DATA_DEFAULT, BIOMES_DATA_LOCATION, BIOMES_DIR_PATH},
+    constants::BIOMES_DIR_PATH,
     errors::BiomeError,
     resources::BiomeManager,
 };
@@ -59,7 +58,7 @@ pub struct TileTextureData {
     pub id: TileId,
     pub sync_group_id: Option<String>,
     pub style: TileStyle,
-    pub textures: Vec<u8>,
+    pub frames: Vec<u8>,
     pub animation_length: f32,
 }
 
@@ -69,13 +68,13 @@ impl TileTextureData {
             id: String::new(),
             sync_group_id: None,
             style: TileStyle::Single,
-            textures: Vec::new(),
+            frames: Vec::new(),
             animation_length: 1.0f32,
         }
     }
 
-    pub fn get_first_texture(&self) -> u8 {
-        self.textures[0]
+    pub fn get_first_frame(&self) -> u8 {
+        self.frames[0]
     }
 }
 
@@ -87,11 +86,11 @@ pub enum TileStyle {
 }
 
 impl BiomeData {
-    /// Loads all the biomes from [BIOMES_DIR_PATH]
-    pub fn load_biomes() -> anyhow::Result<Vec<Self>> {
+    /// Loads all the biomes from [path]
+    pub fn load_biomes<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Self>> {
         let mut biomes: Vec<_> = vec![];
 
-        if let Ok(biome_dir) = fs::read_dir(BIOMES_DIR_PATH) {
+        if let Ok(biome_dir) = fs::read_dir(path) {
             for biome_dir in biome_dir {
                 if let Ok(entry) = biome_dir {
                     let biome_data = Self::load_biome_data(entry.path());
@@ -115,16 +114,18 @@ impl BiomeData {
         Ok(biomes)
     }
 
-    /// Loads the biome data from a directory
+    /// Loads the biome data from a directory. [path] must be a directory.
     fn load_biome_data(path: PathBuf) -> anyhow::Result<BiomeData> {
         let biome_data_path = path.to_str().unwrap().to_owned() + "/data.json";
         let biome_dir_name = path.file_name().unwrap().to_str().unwrap().to_owned();
 
+        // Turns the file contents into a string
         let file_string = fs::read_to_string(&biome_data_path).map_err(|e| BiomeError::NoData {
             name: biome_dir_name.clone(),
             error: e.to_string(),
         })?;
 
+        // Serializes string into biome data
         let biome_data = serde_json::from_str::<BiomeData>(&file_string).map_err(|e| {
             BiomeError::InvalidData {
                 name: biome_dir_name.clone(),

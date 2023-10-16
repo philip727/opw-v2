@@ -9,6 +9,7 @@ pub mod animation;
 pub mod camera;
 pub mod player;
 pub mod world;
+pub mod entity_skin;
 
 pub struct GamePlugins;
 

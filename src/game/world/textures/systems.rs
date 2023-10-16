@@ -47,7 +47,7 @@ pub fn handle_chunk_rerender(
                         tile_properties.biome_offset = biome_offset;
 
                         *tile_texture_index =
-                            TileTextureIndex(biome_offset + data.get_first_texture() as u32);
+                            TileTextureIndex(biome_offset + data.get_first_frame() as u32);
                     }
                 }
 

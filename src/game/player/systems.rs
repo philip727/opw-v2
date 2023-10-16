@@ -4,6 +4,7 @@ use bevy_ecs_tilemap::tiles::TilePos;
 use crate::game::{
     animation::components::AnimationStateMachine,
     camera::components::CameraTarget,
+    entity_skin::helpers::EntitySkin,
     world::{
         collisions::{components::TileProperties, helpers::colliding_with_wall},
         generation::components::{Chunk, ChunkTarget},
@@ -15,17 +16,25 @@ use super::{
     constants::PLAYER_POS_Z,
 };
 
-pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let hashmap = HashMap::new();
+pub fn spawn_player(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+) {
+    let entity_skin = EntitySkin::load_from_path("./data/skins/default".into()).unwrap();
+    let texture_atlas = entity_skin.generate_texture_atlas(&asset_server);
+    let animation_state: AnimationStateMachine = entity_skin.into();
+    let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
     commands.spawn((
         Name::new("Player"),
-        SpriteBundle {
-            texture: asset_server.load("player/skins/default/default.png"),
+        SpriteSheetBundle {
+            texture_atlas: texture_atlas_handle,
+            sprite: TextureAtlasSprite::new(0),
             transform: Transform::from_xyz(0.0, 0.0, PLAYER_POS_Z),
             ..Default::default()
         },
-        AnimationStateMachine::new("Idle".into(), hashmap),
+        animation_state,
         MovementController::default(),
         DirectionController,
         ChunkTarget,
@@ -81,7 +90,7 @@ pub fn manage_movement(
 }
 
 pub fn manage_direction(
-    mut player_query: Query<(&Transform, &mut Sprite), With<DirectionController>>,
+    mut player_query: Query<(&Transform, &mut TextureAtlasSprite), With<DirectionController>>,
     camera_query: Query<(&GlobalTransform, &Camera), Without<DirectionController>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {

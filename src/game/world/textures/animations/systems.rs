@@ -33,7 +33,7 @@ pub fn handle_synced_animations(
                 sync_group_id.clone(),
                 SyncedTileAnimation {
                     currrent_index: 0,
-                    texture_length: properties.data.textures.len(),
+                    texture_length: properties.data.frames.len(),
                     current_time: 0.0,
                     animation_length: properties.data.animation_length,
                 },
@@ -74,7 +74,7 @@ pub fn handle_animated_tiles(
         {
             *texture_index = TileTextureIndex(
                 properties.biome_offset
-                    + properties.data.textures[synced_animation.currrent_index] as u32,
+                    + properties.data.frames[synced_animation.currrent_index] as u32,
             );
         }
     }

@@ -9,7 +9,7 @@
         "water": {
             "id": "tile:grasslands:water",
             "style": "Single",
-            "textures": [
+            "frames": [
                 22
             ],
             "animation_length": 2.0
@@ -17,7 +17,7 @@
         "top_left": {
             "id": "tile:grasslands:top_left",
             "style": "Single",
-            "textures": [
+            "frames": [
                 0
             ],
             "animation_length": 1.0
@@ -25,7 +25,7 @@
         "top_middle": {
             "id": "tile:grasslands:top_middle",
             "style": "Single",
-            "textures": [
+            "frames": [
                 1
             ],
             "animation_length": 1.0
@@ -33,7 +33,7 @@
         "top_right": {
             "id": "tile:grasslands:top_right",
             "style": "Single",
-            "textures": [
+            "frames": [
                 2
             ],
             "animation_length": 1.0
@@ -41,7 +41,7 @@
         "middle": {
             "id": "tile:grasslands:middle",
             "style": "Single",
-            "textures": [
+            "frames": [
                 3
             ],
             "animation_length": 1.0
@@ -49,7 +49,7 @@
         "middle_left": {
             "id": "tile:grasslands:middle_left",
             "style": "Single",
-            "textures": [
+            "frames": [
                 4
             ],
             "animation_length": 1.0
@@ -57,7 +57,7 @@
         "middle_right": {
             "id": "tile:grasslands:middle_right",
             "style": "Single",
-            "textures": [
+            "frames": [
                 5
             ],
             "animation_length": 1.0
@@ -65,7 +65,7 @@
         "down_right": {
             "id": "tile:grasslands:down_right",
             "style": "Single",
-            "textures": [
+            "frames": [
                 6
             ],
             "animation_length": 1.0
@@ -73,7 +73,7 @@
         "down_left": {
             "id": "tile:grasslands:down_left",
             "style": "Single",
-            "textures": [
+            "frames": [
                 7
             ],
             "animation_length": 1.0
@@ -81,7 +81,7 @@
         "up_right": {
             "id": "tile:grasslands:up_right",
             "style": "Single",
-            "textures": [
+            "frames": [
                 8
             ],
             "animation_length": 1.0
@@ -89,7 +89,7 @@
         "up_left": {
             "id": "tile:grasslands:up_left",
             "style": "Single",
-            "textures": [
+            "frames": [
                 9
             ],
             "animation_length": 1.0
@@ -98,7 +98,7 @@
             "id": "tile:grasslands:bottom_left",
             "sync_group_id": "sync_group:water",
             "style": "Animated",
-            "textures": [
+            "frames": [
                 10,
                 11,
                 12,
@@ -112,7 +112,7 @@
             "id": "tile:grasslands:bottom_middle",
             "sync_group_id": "sync_group:water",
             "style": "Animated",
-            "textures": [
+            "frames": [
                 14,
                 15,
                 16,
@@ -126,7 +126,7 @@
             "id": "tile:grasslands:bottom_right",
             "sync_group_id": "sync_group:water",
             "style": "Animated",
-            "textures": [
+            "frames": [
                 18,
                 19,
                 20,
