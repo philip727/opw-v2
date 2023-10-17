@@ -6,6 +6,7 @@ use crate::{
     game::world::{
         biomes::resources::BiomeManager,
         collisions::resources::WorldCollisionManager,
+        events::EnterWorldEvent,
         helpers::{IntoThresholdPos, IntoTranslation, IntoWorldPos, SetZToChunkZ, ThresholdPos},
         resources::WorldManager,
         ruletile::helpers::RuletileMap,
@@ -25,9 +26,14 @@ use super::{
     resources::WorldGenerationManager,
 };
 
-pub fn setup_world_gen(mut world_gen_manager: ResMut<WorldGenerationManager>) {
-    world_gen_manager.seed = SEED;
-    world_gen_manager.rng = Some(StdRng::seed_from_u64(world_gen_manager.seed as u64))
+pub fn setup_world_gen(
+    mut world_gen_manager: ResMut<WorldGenerationManager>,
+    mut enter_world_event_reader: EventReader<EnterWorldEvent>,
+) {
+    for event in enter_world_event_reader.iter() {
+        world_gen_manager.seed = event.seed;
+        world_gen_manager.rng = Some(StdRng::seed_from_u64(world_gen_manager.seed as u64))
+    }
 }
 
 pub fn spawn_chunk(
@@ -66,7 +72,6 @@ pub fn update_chunk_from_target(
     });
 }
 
-const SEED: u32 = 1203;
 pub fn generate_texture_for_chunk(
     mut commands: Commands,
     mut request_texture_map_event_reader: EventReader<RequestTextureMap>,

@@ -1,12 +1,14 @@
 pub mod game;
 pub mod math;
 pub mod menu;
+pub mod states;
 
 use bevy::{prelude::*, window::*};
 use bevy_framepace::{FramepaceSettings, Limiter};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use game::GamePlugins;
 use menu::MenuUIPlugin;
+use states::AppState;
 
 fn main() {
     App::new()
@@ -30,6 +32,7 @@ fn main() {
             MenuUIPlugin,
             GamePlugins,
         ))
+        .add_state::<AppState>()
         .insert_resource(Msaa::Off)
         .run();
 }

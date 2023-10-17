@@ -2,7 +2,9 @@ use std::fs;
 
 use bevy::prelude::*;
 
-use super::{constants::DEFAULT_DATA_DIR, states::WorldState};
+use crate::states::AppState;
+
+use super::{constants::DEFAULT_DATA_DIR, events::EnterWorldEvent, states::WorldState};
 
 pub fn create_data_folder() {
     if !fs::metadata(DEFAULT_DATA_DIR).is_ok() || !fs::metadata(DEFAULT_DATA_DIR).unwrap().is_dir()
@@ -14,6 +16,12 @@ pub fn create_data_folder() {
     }
 }
 
-pub fn eneter_world(mut commands: Commands) {
-    commands.insert_resource(NextState(Some(WorldState::LoadBiomes)));
+pub fn enter_world(
+    mut commands: Commands,
+    mut enter_world_event_reader: EventReader<EnterWorldEvent>,
+) {
+    for _ in enter_world_event_reader.iter() {
+        commands.insert_resource(NextState(Some(WorldState::LoadBiomes)));
+        commands.insert_resource(NextState(Some(AppState::InGame)));
+    }
 }

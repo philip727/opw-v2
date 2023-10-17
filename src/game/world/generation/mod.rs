@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::states::AppState;
+
 use self::{
     events::RequestTextureMap,
     resources::WorldGenerationManager,
@@ -24,7 +26,8 @@ impl Plugin for WorldGenerationPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<WorldGenerationManager>()
             .add_event::<RequestTextureMap>()
-            .add_systems(OnEnter(WorldState::Created), (setup_world_gen, spawn_chunk))
+            .add_systems(Update, setup_world_gen.run_if(in_state(AppState::InMenu)))
+            .add_systems(OnEnter(WorldState::Created), spawn_chunk)
             .add_systems(
                 Update,
                 (

@@ -1,18 +1,22 @@
 use bevy::prelude::*;
 
+use crate::states::AppState;
+
 use self::{
     biomes::WorldBiomePlugin,
     collisions::WorldCollisionPlugin,
+    events::EnterWorldEvent,
     generation::WorldGenerationPlugin,
     resources::WorldManager,
     states::WorldState,
-    systems::{create_data_folder, eneter_world},
+    systems::{create_data_folder, enter_world},
     textures::WorldTexturePlugin,
 };
 
 pub mod biomes;
 pub mod collisions;
 pub mod constants;
+pub mod events;
 pub mod generation;
 pub mod helpers;
 pub mod resources;
@@ -26,8 +30,10 @@ pub struct WorldPlugins;
 impl Plugin for WorldPlugins {
     fn build(&self, app: &mut App) {
         app.init_resource::<WorldManager>()
+            .add_event::<EnterWorldEvent>()
             .add_state::<WorldState>()
-            .add_systems(Startup, (create_data_folder, eneter_world))
+            .add_systems(Startup, create_data_folder)
+            .add_systems(Update, enter_world.run_if(in_state(AppState::InMenu)))
             .add_plugins((
                 WorldGenerationPlugin,
                 WorldTexturePlugin,
