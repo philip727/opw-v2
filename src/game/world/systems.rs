@@ -14,6 +14,6 @@ pub fn create_data_folder() {
     }
 }
 
-pub fn enter_game(mut commands: Commands) {
+pub fn eneter_world(mut commands: Commands) {
     commands.insert_resource(NextState(Some(WorldState::LoadBiomes)));
 }

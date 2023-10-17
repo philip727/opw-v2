@@ -1,10 +1,12 @@
 pub mod game;
 pub mod math;
+pub mod menu;
 
 use bevy::{prelude::*, window::*};
-use bevy_framepace::{FramepacePlugin, FramepaceSettings, Limiter};
+use bevy_framepace::{FramepaceSettings, Limiter};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use game::GamePlugins;
+use menu::MenuUIPlugin;
 
 fn main() {
     App::new()
@@ -25,8 +27,10 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()),
             WorldInspectorPlugin::new(),
+            MenuUIPlugin,
             GamePlugins,
         ))
+        .insert_resource(Msaa::Off)
         .run();
 }
 

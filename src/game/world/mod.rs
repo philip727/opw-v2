@@ -6,7 +6,7 @@ use self::{
     generation::WorldGenerationPlugin,
     resources::WorldManager,
     states::WorldState,
-    systems::{create_data_folder, enter_game},
+    systems::{create_data_folder, eneter_world},
     textures::WorldTexturePlugin,
 };
 
@@ -27,7 +27,7 @@ impl Plugin for WorldPlugins {
     fn build(&self, app: &mut App) {
         app.init_resource::<WorldManager>()
             .add_state::<WorldState>()
-            .add_systems(Startup, (create_data_folder, enter_game))
+            .add_systems(Startup, (create_data_folder, eneter_world))
             .add_plugins((
                 WorldGenerationPlugin,
                 WorldTexturePlugin,
