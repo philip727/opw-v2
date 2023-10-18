@@ -24,7 +24,7 @@ impl Plugin for WorldTexturePlugin {
         app.add_event::<RequestChunkRender>()
             .init_resource::<WorldTextureManager>()
             .init_resource::<TileAnimationManager>()
-            .add_systems(OnEnter(WorldState::GenerateTextureMap), pack_textures)
+            .add_systems(OnEnter(WorldState::GenerateTextureAtlas), pack_textures)
             .add_systems(
                 Update,
                 (

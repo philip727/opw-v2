@@ -4,10 +4,11 @@ pub mod menu;
 pub mod states;
 
 use bevy::{prelude::*, window::*};
+use bevy_asset_loader::prelude::*;
 use bevy_framepace::{FramepaceSettings, Limiter};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use game::GamePlugins;
-use menu::MenuUIPlugin;
+use menu::{assets::MenuAssets, MenuUIPlugin};
 use states::AppState;
 
 fn main() {
@@ -32,6 +33,10 @@ fn main() {
             MenuUIPlugin,
             GamePlugins,
         ))
+        .add_loading_state(
+            LoadingState::new(AppState::AssetLoading).continue_to_state(AppState::InMenu),
+        )
+        .add_collection_to_loading_state::<_, MenuAssets>(AppState::AssetLoading)
         .add_state::<AppState>()
         .insert_resource(Msaa::Off)
         .run();

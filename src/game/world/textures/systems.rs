@@ -13,9 +13,9 @@ use crate::game::world::{
 use crate::math::map::ValueMap2D;
 
 pub fn pack_textures(biome_manager: Res<BiomeManager>, mut commands: Commands) {
-    info!("Texture atlas created");
     generate_texture_atlas(&biome_manager.loaded);
 
+    info!("Texture atlas created");
     commands.insert_resource(NextState(Some(WorldState::Created)));
 }
 

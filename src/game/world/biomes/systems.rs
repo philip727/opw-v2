@@ -26,5 +26,5 @@ pub fn setup_biome_data(mut biome_manager: ResMut<BiomeManager>, mut commands: C
     }
 
     biome_manager.loaded = biome_data;
-    commands.insert_resource(NextState(Some(WorldState::GenerateTextureMap)));
+    commands.insert_resource(NextState(Some(WorldState::GenerateTextureAtlas)));
 }

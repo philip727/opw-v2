@@ -26,11 +26,12 @@ use super::{
     resources::WorldGenerationManager,
 };
 
-pub fn setup_world_gen(
+pub fn create_world_generation_settings(
     mut world_gen_manager: ResMut<WorldGenerationManager>,
     mut enter_world_event_reader: EventReader<EnterWorldEvent>,
 ) {
     for event in enter_world_event_reader.iter() {
+        info!("Hi");
         world_gen_manager.seed = event.seed;
         world_gen_manager.rng = Some(StdRng::seed_from_u64(world_gen_manager.seed as u64))
     }
@@ -53,7 +54,7 @@ pub fn spawn_chunk(
     });
 }
 
-pub fn update_chunk_from_target(
+pub fn update_chunk_pos(
     mut world_gen_manager: ResMut<WorldGenerationManager>,
     mut request_texture_map_event_writer: EventWriter<RequestTextureMap>,
     target_query: Query<&Transform, With<ChunkTarget>>,
@@ -72,7 +73,7 @@ pub fn update_chunk_from_target(
     });
 }
 
-pub fn generate_texture_for_chunk(
+pub fn request_chunk_texture_map(
     mut commands: Commands,
     mut request_texture_map_event_reader: EventReader<RequestTextureMap>,
     world_texture_manager: Res<WorldTextureManager>,
@@ -161,7 +162,7 @@ pub fn generate_texture_for_chunk(
     }
 }
 
-pub fn handle_texture_map_generation_task(
+pub fn handle_chunk_texture_map(
     mut commands: Commands,
     mut texture_map_tasks: Query<(Entity, &mut ComputeTextureMap)>,
     mut request_chunk_rerender_event_writer: EventWriter<RequestChunkRender>,

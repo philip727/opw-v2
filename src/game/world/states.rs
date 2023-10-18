@@ -5,6 +5,6 @@ pub enum WorldState {
     #[default]
     Initial,
     LoadBiomes,
-    GenerateTextureMap,
+    GenerateTextureAtlas,
     Created,
 }
