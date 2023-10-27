@@ -1,19 +1,17 @@
-use bevy::{prelude::*, utils::HashMap};
+use std::time::Duration;
+
+use bevy::{utils::HashMap};
+
+use crate::common::state_machine::{components::StateMachine, helpers::State};
 
 use super::helpers::{AnimationState, AnimationStateTitle};
 
-#[derive(Component)]
-pub struct AnimationStateMachine {
-    states: HashMap<AnimationStateTitle, AnimationState>,
-    current_state: AnimationStateTitle,
-}
-
-impl AnimationStateMachine {
+impl StateMachine<AnimationState> {
     pub fn new(
         first_state: AnimationStateTitle,
         states: HashMap<AnimationStateTitle, AnimationState>,
-    ) -> AnimationStateMachine {
-        AnimationStateMachine {
+    ) -> Self {
+        Self {
             states,
             current_state: first_state,
         }
@@ -41,5 +39,20 @@ impl AnimationStateMachine {
 
     pub fn is_current_state(&self, state_name: String) -> bool {
         self.current_state == state_name
+    }
+
+    pub fn tick(&mut self, tick_by: Duration) -> Option<u8> {
+        let state = self.mut_state();
+
+        if state.tick(tick_by) {
+            let next_frame = state.next_frame();
+            if let Some(state) = state.transition_to() {
+                let _ = self.set_state(state);
+            }
+
+            return Some(next_frame);
+        }
+
+        None
     }
 }

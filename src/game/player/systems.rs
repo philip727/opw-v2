@@ -1,17 +1,20 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_ecs_tilemap::tiles::TilePos;
 
-use crate::game::{
-    camera::components::CameraTarget,
-    common::{
-        animation::components::AnimationStateMachine, skin::helpers::EntitySkin,
-        velocity::components::Velocity,
-    },
-    world::{
-        collisions::{components::TileProperties, helpers::colliding_with_wall},
-        generation::{
-            components::{Chunk, ChunkTarget},
-            constants::TILE_SIZE,
+use crate::{
+    common::state_machine::components::StateMachine,
+    game::{
+        camera::components::CameraTarget,
+        common::{
+            animation::helpers::AnimationState, skin::helpers::EntitySkin,
+            velocity::components::Velocity,
+        },
+        world::{
+            collisions::{components::TileProperties, helpers::colliding_with_wall},
+            generation::{
+                components::{Chunk, ChunkTarget},
+                constants::TILE_SIZE,
+            },
         },
     },
 };
@@ -28,7 +31,7 @@ pub fn spawn_player(
 ) {
     let entity_skin = EntitySkin::load_from_path("./data/skins/default".into()).unwrap();
     let texture_atlas = entity_skin.generate_texture_atlas(&asset_server);
-    let animation_state: AnimationStateMachine = entity_skin.into();
+    let animation_state: StateMachine<AnimationState> = entity_skin.into();
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
     commands.spawn((
@@ -124,7 +127,7 @@ pub fn manage_direction(
 }
 
 pub fn manage_state_machine(
-    mut player_query: Query<(&mut AnimationStateMachine, &Velocity), With<Player>>,
+    mut player_query: Query<(&mut StateMachine<AnimationState>, &Velocity), With<Player>>,
 ) {
     let (mut state_machine, velocity) = player_query.single_mut();
 

@@ -1,3 +1,4 @@
+pub mod common;
 pub mod game;
 pub mod math;
 pub mod menu;
@@ -7,13 +8,18 @@ use bevy::{prelude::*, window::*};
 use bevy_asset_loader::prelude::*;
 use bevy_framepace::{FramepaceSettings, Limiter};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use common::ui::UIPlugin;
 use game::GamePlugins;
 use menu::{assets::MenuAssets, MenuUIPlugin};
 use states::AppState;
 
 fn main() {
     App::new()
-        // Dev Plugins
+        .add_state::<AppState>()
+        .add_loading_state(
+            LoadingState::new(AppState::AssetLoading).continue_to_state(AppState::InMenu),
+        )
+        .add_collection_to_loading_state::<_, MenuAssets>(AppState::AssetLoading)
         .add_plugins((
             DefaultPlugins
                 .set(WindowPlugin {
@@ -32,12 +38,8 @@ fn main() {
             WorldInspectorPlugin::new(),
             MenuUIPlugin,
             GamePlugins,
+            UIPlugin,
         ))
-        .add_loading_state(
-            LoadingState::new(AppState::AssetLoading).continue_to_state(AppState::InMenu),
-        )
-        .add_collection_to_loading_state::<_, MenuAssets>(AppState::AssetLoading)
-        .add_state::<AppState>()
         .insert_resource(Msaa::Off)
         .run();
 }

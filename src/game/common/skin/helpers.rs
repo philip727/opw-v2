@@ -4,7 +4,10 @@ use std::{fs, path::PathBuf};
 use bevy::{prelude::*, sprite::TextureAtlas, utils::HashMap};
 use serde::{Deserialize, Serialize};
 
-use crate::game::common::animation::{components::AnimationStateMachine, helpers::{AnimationState, AnimationStateTitle}};
+use crate::{
+    common::state_machine::components::StateMachine,
+    game::common::animation::helpers::{AnimationState, AnimationStateTitle},
+};
 
 pub type EntitySkinId = String;
 #[derive(Serialize, Deserialize, Clone)]
@@ -54,8 +57,8 @@ impl EntitySkin {
     }
 }
 
-impl Into<AnimationStateMachine> for EntitySkin {
-    fn into(self) -> AnimationStateMachine {
+impl Into<StateMachine<AnimationState>> for EntitySkin {
+    fn into(self) -> StateMachine<AnimationState> {
         let mut state_hashmap = HashMap::new();
 
         for animation in self.animations {
@@ -65,7 +68,7 @@ impl Into<AnimationStateMachine> for EntitySkin {
             );
         }
 
-        AnimationStateMachine::new(self.default_state, state_hashmap)
+        StateMachine::<AnimationState>::new(self.default_state, state_hashmap)
     }
 }
 
