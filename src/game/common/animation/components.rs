@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use bevy::{utils::HashMap};
+use bevy::utils::HashMap;
 
 use crate::common::state_machine::{components::StateMachine, helpers::State};
 

@@ -7,3 +7,4 @@ pub struct StateMachine<T: State + Clone> {
     pub states: HashMap<String, T>,
     pub current_state: String,
 }
+

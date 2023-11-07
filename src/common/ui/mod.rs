@@ -1,4 +1,5 @@
 pub mod common;
+pub mod assets;
 
 use bevy::prelude::*;
 

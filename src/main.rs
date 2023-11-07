@@ -8,9 +8,9 @@ use bevy::{prelude::*, window::*};
 use bevy_asset_loader::prelude::*;
 use bevy_framepace::{FramepaceSettings, Limiter};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use common::ui::UIPlugin;
+use common::ui::{UIPlugin, assets::{ButtonAssets, PanelAssets}};
 use game::GamePlugins;
-use menu::{assets::MenuAssets, MenuUIPlugin};
+use menu::MenuUIPlugin;
 use states::AppState;
 
 fn main() {
@@ -19,7 +19,8 @@ fn main() {
         .add_loading_state(
             LoadingState::new(AppState::AssetLoading).continue_to_state(AppState::InMenu),
         )
-        .add_collection_to_loading_state::<_, MenuAssets>(AppState::AssetLoading)
+        .add_collection_to_loading_state::<_, PanelAssets>(AppState::AssetLoading)
+        .add_collection_to_loading_state::<_, ButtonAssets>(AppState::AssetLoading)
         .add_plugins((
             DefaultPlugins
                 .set(WindowPlugin {

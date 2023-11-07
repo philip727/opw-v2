@@ -4,7 +4,6 @@ use crate::{states::AppState, game::world::states::WorldState};
 
 use self::{systems::{cleanup_menu_ui, handle_play_button, spawn_menu_ui, handle_menu_ui_visibility}, events::SetMenuRootEvent};
 
-pub mod assets;
 pub mod components;
 pub mod systems;
 pub mod events;
