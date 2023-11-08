@@ -8,6 +8,7 @@ pub mod components;
 pub mod systems;
 pub mod events;
 pub mod constants;
+pub mod helpers;
 
 pub struct MenuUIPlugin;
 
