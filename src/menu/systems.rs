@@ -11,7 +11,7 @@ use crate::{
 use super::{
     components::{MenuRoot, PlayButton},
     constants::GUI_SCALE,
-    events::SetMenuRootEvent, helpers::{create_button_container, create_left_panel, create_news_panel},
+    events::SetMenuRootEvent, helpers::{create_button_container, create_empty_panel, create_news_panel}, assets::MenuAssets,
 };
 
 // Spawns the men root
@@ -19,6 +19,7 @@ pub fn spawn_menu_ui(
     mut commands: Commands,
     button_assets: Res<ButtonAssets>,
     panel_assets: Res<PanelAssets>,
+    menu_assets: Res<MenuAssets>,
 ) {
     // Main Menu Root
     let mut menu_root = commands.spawn((
@@ -39,8 +40,8 @@ pub fn spawn_menu_ui(
 
     menu_root.with_children(|parent| {
         // Left Panel
-        create_left_panel(parent, &panel_assets, &button_assets);
-        create_button_container(parent, &panel_assets, &button_assets);
+        create_empty_panel(parent, &panel_assets, &button_assets);
+        create_button_container(parent, &menu_assets);
         create_news_panel(parent, &panel_assets, &button_assets);
     });
 }
@@ -71,7 +72,7 @@ pub fn handle_play_button(
             }
             Interaction::None => {
                 //style.height = Val::Px(41. * GUI_SCALE);
-                *image = UiImage::new(button_assets.outlined_button.clone());
+                //*image = UiImage::new(button_assets.outlined_button.clone());
             }
         }
     }
