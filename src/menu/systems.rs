@@ -1,17 +1,16 @@
 use bevy::prelude::*;
 
 use crate::{
-    common::ui::{
-        assets::{ButtonAssets, PanelAssets},
-        common::helpers::{spawn_ui_button, spawn_ui_text},
-    },
+    common::ui::assets::{BrandingAssets, ButtonAssets, PanelAssets},
     game::world::events::EnterWorldEvent,
 };
 
 use super::{
+    assets::MenuAssets,
     components::{MenuRoot, PlayButton},
-    constants::GUI_SCALE,
-    events::SetMenuRootEvent, helpers::{create_button_container, create_empty_panel, create_news_panel}, assets::MenuAssets,
+    events::SetMenuRootEvent,
+    helpers::{create_button_container, create_empty_panel, create_news_panel},
+    world_selection::events::SetWorldSelectionRootEvent,
 };
 
 // Spawns the men root
@@ -19,7 +18,6 @@ pub fn spawn_menu_ui(
     mut commands: Commands,
     button_assets: Res<ButtonAssets>,
     panel_assets: Res<PanelAssets>,
-    menu_assets: Res<MenuAssets>,
 ) {
     // Main Menu Root
     let mut menu_root = commands.spawn((
@@ -41,7 +39,7 @@ pub fn spawn_menu_ui(
     menu_root.with_children(|parent| {
         // Left Panel
         create_empty_panel(parent, &panel_assets, &button_assets);
-        create_button_container(parent, &menu_assets);
+        create_button_container(parent);
         create_news_panel(parent, &panel_assets, &button_assets);
     });
 }
@@ -52,19 +50,20 @@ pub fn handle_play_button(
         (&Interaction, &mut UiImage, &mut Style),
         (With<PlayButton>, Changed<Interaction>),
     >,
-    mut enter_world_event_writer: EventWriter<EnterWorldEvent>,
     mut set_menu_root_event_writer: EventWriter<SetMenuRootEvent>,
-    button_assets: Res<ButtonAssets>,
+    mut set_world_selection_root_event_writer: EventWriter<SetWorldSelectionRootEvent>,
 ) {
-    if let Ok((interaction, mut image, mut style)) = play_button_query.get_single_mut() {
+    if let Ok((interaction, mut _image, mut _style)) = play_button_query.get_single_mut() {
         match *interaction {
             Interaction::Pressed => {
-                enter_world_event_writer.send(EnterWorldEvent {
-                    name: "HAHAHAH".into(),
-                    seed: 1204,
-                });
+                // enter_world_event_writer.send(EnterWorldEvent {
+                //     name: "HAHAHAH".into(),
+                //     seed: 1204,
+                // });
 
-                set_menu_root_event_writer.send(SetMenuRootEvent { visibility: false })
+                set_menu_root_event_writer.send(SetMenuRootEvent { visibility: false });
+                set_world_selection_root_event_writer
+                    .send(SetWorldSelectionRootEvent { visibility: true });
             }
             Interaction::Hovered => {
                 //*image = UiImage::new(menu_assets.play_button_hover.clone());
@@ -80,11 +79,11 @@ pub fn handle_play_button(
 
 // Changes the visibility of the main root
 pub fn handle_menu_ui_visibility(
-    mut menu_root_query: Query<&mut Visibility, With<MenuRoot>>,
+    mut root_query: Query<&mut Visibility, With<MenuRoot>>,
     mut set_menu_root_event_reader: EventReader<SetMenuRootEvent>,
 ) {
-    for event in set_menu_root_event_reader.iter() {
-        if let Ok(mut visible) = menu_root_query.get_single_mut() {
+    for event in set_menu_root_event_reader.read() {
+        if let Ok(mut visible) = root_query.get_single_mut() {
             *visible = if event.visibility {
                 Visibility::Visible
             } else {
@@ -95,6 +94,6 @@ pub fn handle_menu_ui_visibility(
 }
 
 // Despawns the main root entity
-pub fn cleanup_menu_ui(mut commands: Commands, menu_root_query: Query<Entity, With<MenuRoot>>) {
-    commands.entity(menu_root_query.single()).despawn();
+pub fn cleanup_menu_ui(mut commands: Commands, root_query: Query<Entity, With<MenuRoot>>) {
+    commands.entity(root_query.single()).despawn();
 }

@@ -9,7 +9,7 @@ use bevy_asset_loader::prelude::*;
 use bevy_framepace::{FramepaceSettings, Limiter};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use common::ui::{
-    assets::{ButtonAssets, PanelAssets},
+    assets::{ButtonAssets, PanelAssets, BrandingAssets},
     UIPlugin,
 };
 use game::GamePlugins;
@@ -25,6 +25,7 @@ fn main() {
         .add_collection_to_loading_state::<_, MenuAssets>(AppState::AssetLoading)
         .add_collection_to_loading_state::<_, PanelAssets>(AppState::AssetLoading)
         .add_collection_to_loading_state::<_, ButtonAssets>(AppState::AssetLoading)
+        .add_collection_to_loading_state::<_, BrandingAssets>(AppState::AssetLoading)
         .add_plugins((
             DefaultPlugins
                 .set(WindowPlugin {

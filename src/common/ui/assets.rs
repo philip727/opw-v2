@@ -12,3 +12,9 @@ pub struct PanelAssets {
     #[asset(path="ui/panels/tall-slim-panel.png")]
     pub tall_slim: Handle<Image>
 }
+
+#[derive(AssetCollection, Resource)]
+pub struct BrandingAssets {
+    #[asset(path="branding/main-logo.png")]
+    pub main_logo: Handle<Image>
+}

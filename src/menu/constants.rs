@@ -1,1 +1,1 @@
-pub const GUI_SCALE: f32 = 3.0;
+pub const FONT_SIZE: f32 = 16.0;
