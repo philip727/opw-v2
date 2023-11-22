@@ -8,7 +8,8 @@ use self::{
     world_selection::{
         events::SetWorldSelectionRootEvent,
         systems::{
-            cleanup_world_selection_ui, handle_world_selection_ui_visibility, spawn_world_selection_ui,
+            cleanup_world_selection_ui, handle_world_selection_ui_visibility,
+            populate_worlds_container, spawn_world_selection_ui,
         },
     },
 };
@@ -27,7 +28,13 @@ impl Plugin for MenuUIPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SetMenuRootEvent>()
             .add_event::<SetWorldSelectionRootEvent>()
-            .add_systems(OnEnter(AppState::InMenu), (spawn_menu_ui, spawn_world_selection_ui))
+            .add_systems(
+                OnEnter(AppState::InMenu),
+                (
+                    spawn_menu_ui,
+                    spawn_world_selection_ui,
+                ),
+            )
             .add_systems(
                 OnEnter(WorldState::Created),
                 (cleanup_menu_ui, cleanup_world_selection_ui),
@@ -38,6 +45,7 @@ impl Plugin for MenuUIPlugin {
                     handle_play_button,
                     handle_menu_ui_visibility,
                     handle_world_selection_ui_visibility,
+                    populate_worlds_container,
                 )
                     .run_if(in_state(AppState::InMenu)),
             );
