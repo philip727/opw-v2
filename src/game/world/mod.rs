@@ -9,7 +9,7 @@ use self::{
     generation::WorldGenerationPlugin,
     resources::WorldManager,
     states::WorldState,
-    systems::{create_data_folder, enter_world},
+    systems::{create_data_directory, enter_world},
     textures::WorldTexturePlugin,
 };
 
@@ -32,7 +32,7 @@ impl Plugin for WorldPlugins {
         app.init_resource::<WorldManager>()
             .add_event::<EnterWorldEvent>()
             .add_state::<WorldState>()
-            .add_systems(Startup, create_data_folder)
+            .add_systems(Startup, create_data_directory)
             .add_systems(Update, enter_world.run_if(in_state(AppState::InMenu)))
             .add_plugins((
                 WorldGenerationPlugin,

@@ -87,13 +87,13 @@ pub enum TileStyle {
 
 impl BiomeData {
     /// Loads all the biomes from [path]
-    pub fn load_biomes<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Self>> {
+    pub fn load_all<P: AsRef<Path>>(path: P) -> anyhow::Result<Vec<Self>> {
         let mut biomes: Vec<_> = vec![];
 
-        if let Ok(biome_dir) = fs::read_dir(path) {
-            for biome_dir in biome_dir {
+        if let Ok(biomes_dir) = fs::read_dir(path) {
+            for biome_dir in biomes_dir {
                 if let Ok(entry) = biome_dir {
-                    let biome_data = Self::load_biome_data(entry.path());
+                    let biome_data = Self::load(entry.path());
                     match biome_data {
                         Ok(biome_data) => biomes.push(biome_data),
                         Err(e) => {
@@ -115,7 +115,7 @@ impl BiomeData {
     }
 
     /// Loads the biome data from a directory. [path] must be a directory.
-    fn load_biome_data(path: PathBuf) -> anyhow::Result<BiomeData> {
+    fn load(path: PathBuf) -> anyhow::Result<BiomeData> {
         let biome_data_path = path.to_str().unwrap().to_owned() + "/data.json";
         let biome_dir_name = path.file_name().unwrap().to_str().unwrap().to_owned();
 
@@ -128,7 +128,7 @@ impl BiomeData {
         // Serializes string into biome data
         let biome_data = serde_json::from_str::<BiomeData>(&file_string).map_err(|e| {
             BiomeError::InvalidData {
-                name: biome_dir_name.clone(),
+                name: biome_dir_name,
                 error: e.to_string(),
             }
         })?;

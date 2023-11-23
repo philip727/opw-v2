@@ -10,7 +10,7 @@ use super::resources::BiomeManager;
 pub fn setup_biome_data(mut biome_manager: ResMut<BiomeManager>, mut commands: Commands) {
     info!("Biome data loaded");
     let tile_size_u32 = TILE_SIZE as u32;
-    let biome_data = BiomeData::load_biomes(BIOMES_DIR_PATH).unwrap();
+    let biome_data = BiomeData::load_all(BIOMES_DIR_PATH).unwrap();
 
     // Creates the offset for each tilemap by id
     let mut tile_offset = 0u32;
