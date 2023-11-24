@@ -4,15 +4,11 @@ use crate::{game::world::states::WorldState, states::AppState};
 
 use self::{
     events::SetMenuRootEvent,
-    systems::{cleanup_menu_ui, handle_menu_ui_visibility, handle_play_button, spawn_menu_ui},
+    systems::*,
     world_selection::{
         events::SetWorldSelectionRootEvent,
         resources::WorldSelectionManager,
-        systems::{
-            cleanup_world_selection_ui, create_saves_directory, handle_selecting_world,
-            handle_world_selection_ui_visibility, populate_worlds_container,
-            spawn_world_selection_ui,
-        },
+        systems::*,
     },
 };
 
