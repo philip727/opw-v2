@@ -1,11 +1,11 @@
 use std::{path::{Path, PathBuf}, fs};
 
-use bevy::{prelude::*};
+use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use super::errors::WorldSelectionError;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct WorldSelectionRoot;
 
 #[derive(Component)]

@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
+use super::helpers::Page;
+
 #[derive(Event, PartialEq, Eq, Clone)]
-pub struct SetMenuRootEvent {
-    pub visibility: bool
-}
+#[repr(transparent)]
+pub struct UpdatePage(pub Page);

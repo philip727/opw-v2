@@ -3,13 +3,10 @@ use bevy::prelude::*;
 use crate::{game::world::states::WorldState, states::AppState};
 
 use self::{
-    events::SetMenuRootEvent,
+    events::UpdatePage,
+    resources::MenuManager,
     systems::*,
-    world_selection::{
-        events::SetWorldSelectionRootEvent,
-        resources::WorldSelectionManager,
-        systems::*,
-    },
+    world_selection::{resources::WorldSelectionManager, systems::*},
 };
 
 pub mod assets;
@@ -17,6 +14,7 @@ pub mod components;
 pub mod constants;
 pub mod events;
 pub mod helpers;
+pub mod resources;
 pub mod systems;
 pub mod world_selection;
 
@@ -24,8 +22,8 @@ pub struct MenuUIPlugin;
 
 impl Plugin for MenuUIPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<SetMenuRootEvent>()
-            .add_event::<SetWorldSelectionRootEvent>()
+        app.add_event::<UpdatePage>()
+            .init_resource::<MenuManager>()
             .init_resource::<WorldSelectionManager>()
             .add_systems(Startup, create_saves_directory)
             .add_systems(
@@ -43,19 +41,17 @@ impl Plugin for MenuUIPlugin {
                     // Main Screen
                     cleanup_menu_ui,
                     // World Selection Screen
-                    cleanup_world_selection_ui,
                 ),
             )
             .add_systems(
                 Update,
                 (
                     // Main Screen
-                    handle_play_button,
-                    handle_menu_ui_visibility,
+                    menu_ui_visibility,
+                    handle_page_update_event,
                     // World Selection Screen
-                    populate_worlds_container,
-                    handle_world_selection_ui_visibility,
-                    handle_selecting_world,
+                    world_selection_ui_visibility,
+                    populate_worlds
                 )
                     .run_if(in_state(AppState::InMenu)),
             );

@@ -4,6 +4,7 @@ pub mod math;
 pub mod menu;
 pub mod states;
 
+use belly::prelude::BellyPlugin;
 use bevy::{prelude::*, window::*};
 use bevy_asset_loader::prelude::*;
 use bevy_framepace::{FramepaceSettings, Limiter};
@@ -42,6 +43,7 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()),
             WorldInspectorPlugin::new(),
+            BellyPlugin,
             MenuUIPlugin,
             GamePlugins,
             UIPlugin,
