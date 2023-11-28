@@ -12,6 +12,8 @@ pub mod camera;
 pub mod common;
 pub mod player;
 pub mod world;
+pub mod items;
+pub mod inventory;
 
 pub struct GamePlugins;
 

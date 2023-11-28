@@ -6,7 +6,7 @@ use crate::{
     game::world::{
         biomes::resources::BiomeManager,
         collisions::resources::WorldCollisionManager,
-        events::EnterWorldEvent,
+        events::EnterWorld,
         helpers::{IntoThresholdPos, IntoTranslation, IntoWorldPos, SetZToChunkZ, ThresholdPos},
         resources::WorldManager,
         ruletile::helpers::RuletileMap,
@@ -28,9 +28,9 @@ use super::{
 
 pub fn create_world_generation_settings(
     mut world_gen_manager: ResMut<WorldGenerationManager>,
-    mut enter_world_event_reader: EventReader<EnterWorldEvent>,
+    mut enter_world_event_reader: EventReader<EnterWorld>,
 ) {
-    for event in enter_world_event_reader.iter() {
+    for event in enter_world_event_reader.read() {
         info!("Hi");
         world_gen_manager.seed = event.seed;
         world_gen_manager.rng = Some(StdRng::seed_from_u64(world_gen_manager.seed as u64))
@@ -81,7 +81,7 @@ pub fn request_chunk_texture_map(
     world_generation_manager: Res<WorldGenerationManager>,
     biome_manager: Res<BiomeManager>,
 ) {
-    let noise_map_events: Vec<_> = request_texture_map_event_reader.iter().cloned().collect();
+    let noise_map_events: Vec<_> = request_texture_map_event_reader.read().cloned().collect();
 
     for event in noise_map_events {
         info!("Generating new texture map");

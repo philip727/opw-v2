@@ -25,7 +25,7 @@ pub fn handle_chunk_rerender(
     mut chunk_query: Query<(&mut TileStorage, &mut Transform), With<Chunk>>,
     mut tile_query: Query<(&TilePos, &mut TileTextureIndex, &mut TileProperties)>,
 ) {
-    for event in request_chunk_rerender_reader.iter() {
+    for event in request_chunk_rerender_reader.read() {
         if let Some(chunk_entity) = world_manager.chunk_entity {
             if let Ok((tile_storage, mut transform)) = chunk_query.get_mut(chunk_entity) {
                 let texture_map = &event.texture_map;

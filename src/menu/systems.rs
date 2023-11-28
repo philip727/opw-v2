@@ -18,19 +18,21 @@ pub fn spawn_menu_ui(mut commands: Commands) {
 }
 
 pub fn menu_ui_visibility(mut elements: Elements, menu_manager: Res<MenuManager>) {
-    if menu_manager.is_changed() {
-        match menu_manager.page {
-            Page::Main => {
-                elements.select("#main").remove_class("hidden");
-            }
-            _ => {
-                elements.select("#main").add_class("hidden");
-            }
+    if !menu_manager.is_changed() {
+        return;
+    }
+
+    match menu_manager.page {
+        Page::Main => {
+            elements.select("#main").remove_class("hidden");
+        }
+        _ => {
+            elements.select("#main").add_class("hidden");
         }
     }
 }
 
-pub fn handle_page_update_event(
+pub fn handle_page_updates(
     mut update_page_event_reader: EventReader<UpdatePage>,
     mut menu_manager: ResMut<MenuManager>,
 ) {
@@ -41,5 +43,9 @@ pub fn handle_page_update_event(
 
 // Despawns the main root entity
 pub fn cleanup_menu_ui(mut commands: Commands, root_query: Query<Entity, With<MenuRoot>>) {
-    commands.entity(root_query.single()).despawn();
+    let Ok(entity) = root_query.get_single() else {
+        return;
+    };
+
+    commands.entity(entity).despawn();
 }

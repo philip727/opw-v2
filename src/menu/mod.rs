@@ -6,7 +6,11 @@ use self::{
     events::UpdatePage,
     resources::MenuManager,
     systems::*,
-    world_selection::{resources::WorldSelectionManager, systems::*},
+    world_selection::{
+        events::{StartSelectedWorld, UpdateSelectedWorld},
+        resources::WorldSelectionManager,
+        systems::*,
+    },
 };
 
 pub mod assets;
@@ -23,6 +27,8 @@ pub struct MenuUIPlugin;
 impl Plugin for MenuUIPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<UpdatePage>()
+            .add_event::<StartSelectedWorld>()
+            .add_event::<UpdateSelectedWorld>()
             .init_resource::<MenuManager>()
             .init_resource::<WorldSelectionManager>()
             .add_systems(Startup, create_saves_directory)
@@ -41,17 +47,20 @@ impl Plugin for MenuUIPlugin {
                     // Main Screen
                     cleanup_menu_ui,
                     // World Selection Screen
+                    cleanup_world_selection_ui,
                 ),
             )
             .add_systems(
                 Update,
                 (
+                    handle_page_updates,
                     // Main Screen
                     menu_ui_visibility,
-                    handle_page_update_event,
                     // World Selection Screen
                     world_selection_ui_visibility,
-                    populate_worlds
+                    populate_worlds,
+                    start_selected_world,
+                    update_selected_world,
                 )
                     .run_if(in_state(AppState::InMenu)),
             );

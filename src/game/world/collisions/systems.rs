@@ -16,7 +16,7 @@ pub fn handle_collision_update(
     world_manager: Res<WorldManager>,
     mut tile_query: Query<(&mut TileProperties, &TilePos)>,
 ) {
-    for event in request_chunk_rerender_reader.iter() {
+    for event in request_chunk_rerender_reader.read() {
         if let None = world_manager.chunk_entity {
             continue;
         }

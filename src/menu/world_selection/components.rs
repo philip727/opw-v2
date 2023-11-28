@@ -11,7 +11,7 @@ pub struct WorldSelectionRoot;
 #[derive(Component)]
 pub struct WorldsContainer;
 
-#[derive(Serialize, Deserialize, Component, Clone, Debug)]
+#[derive(Serialize, Deserialize, Component, Clone, Debug, PartialEq, Copy)]
 pub struct WorldSelectionData {
     pub seed: u32,
 }

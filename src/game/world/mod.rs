@@ -5,7 +5,7 @@ use crate::states::AppState;
 use self::{
     biomes::WorldBiomePlugin,
     collisions::WorldCollisionPlugin,
-    events::EnterWorldEvent,
+    events::EnterWorld,
     generation::WorldGenerationPlugin,
     resources::WorldManager,
     states::WorldState,
@@ -30,7 +30,7 @@ pub struct WorldPlugins;
 impl Plugin for WorldPlugins {
     fn build(&self, app: &mut App) {
         app.init_resource::<WorldManager>()
-            .add_event::<EnterWorldEvent>()
+            .add_event::<EnterWorld>()
             .add_state::<WorldState>()
             .add_systems(Startup, create_data_directory)
             .add_systems(Update, enter_world.run_if(in_state(AppState::InMenu)))

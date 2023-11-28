@@ -59,54 +59,56 @@ pub fn manage_movement(
     chunk_query: Query<&Transform, (With<Chunk>, Without<MovementController>)>,
     time: Res<Time>,
 ) {
-    if let Ok((mut transform, movement_controller)) = player_query.get_single_mut() {
-        let mut direction = Vec3::ZERO;
+    let Ok((mut transform, movement_controller)) = player_query.get_single_mut() else {
+        return;
+    };
 
-        let mut x_delta: f32 = 0.0;
-        if keyboard_input.pressed(KeyCode::Left) || keyboard_input.pressed(KeyCode::A) {
-            x_delta = -1.0;
-        }
-        if keyboard_input.pressed(KeyCode::Right) || keyboard_input.pressed(KeyCode::D) {
-            x_delta = 1.0;
-        }
+    let mut direction = Vec3::ZERO;
 
-        let mut y_delta: f32 = 0.0;
-        if keyboard_input.pressed(KeyCode::Up) || keyboard_input.pressed(KeyCode::W) {
-            y_delta = 1.0;
-        }
-        if keyboard_input.pressed(KeyCode::Down) || keyboard_input.pressed(KeyCode::S) {
-            y_delta = -1.0;
-        }
-
-        // Allows us to slide against walls
-        let chunk_transform = chunk_query.single();
-        let target = transform.translation + Vec3::new(x_delta, 0.0, 0.0);
-        if !colliding_with_wall(
-            Vec2::splat(TILE_SIZE),
-            target,
-            &tile_query,
-            &chunk_transform,
-        ) {
-            direction += Vec3::new(x_delta, 0.0, 0.0);
-        }
-
-        let target = transform.translation + Vec3::new(0.0, y_delta, 0.0);
-        if !colliding_with_wall(
-            Vec2::splat(TILE_SIZE),
-            target,
-            &tile_query,
-            &chunk_transform,
-        ) {
-            direction += Vec3::new(0.0, y_delta, 0.0);
-        }
-
-        if !(direction.length() > 0.0) {
-            return;
-        }
-
-        transform.translation +=
-            direction.normalize() * movement_controller.speed * time.delta_seconds();
+    let mut x_delta: f32 = 0.0;
+    if keyboard_input.pressed(KeyCode::Left) || keyboard_input.pressed(KeyCode::A) {
+        x_delta = -1.0;
     }
+    if keyboard_input.pressed(KeyCode::Right) || keyboard_input.pressed(KeyCode::D) {
+        x_delta = 1.0;
+    }
+
+    let mut y_delta: f32 = 0.0;
+    if keyboard_input.pressed(KeyCode::Up) || keyboard_input.pressed(KeyCode::W) {
+        y_delta = 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::Down) || keyboard_input.pressed(KeyCode::S) {
+        y_delta = -1.0;
+    }
+
+    // Allows us to slide against walls
+    let chunk_transform = chunk_query.single();
+    let target = transform.translation + Vec3::new(x_delta, 0.0, 0.0);
+    if !colliding_with_wall(
+        Vec2::splat(TILE_SIZE),
+        target,
+        &tile_query,
+        &chunk_transform,
+    ) {
+        direction += Vec3::new(x_delta, 0.0, 0.0);
+    }
+
+    let target = transform.translation + Vec3::new(0.0, y_delta, 0.0);
+    if !colliding_with_wall(
+        Vec2::splat(TILE_SIZE),
+        target,
+        &tile_query,
+        &chunk_transform,
+    ) {
+        direction += Vec3::new(0.0, y_delta, 0.0);
+    }
+
+    if !(direction.length() > 0.0) {
+        return;
+    }
+
+    transform.translation +=
+        direction.normalize() * movement_controller.speed * time.delta_seconds();
 }
 
 pub fn manage_direction(
@@ -114,9 +116,16 @@ pub fn manage_direction(
     camera_query: Query<(&GlobalTransform, &Camera), Without<DirectionController>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
-    let (player_transform, mut sprite) = player_query.single_mut();
-    let (camera_transform, camera) = camera_query.single();
-    let window = window_query.single();
+    let Ok((player_transform, mut sprite)) = player_query.get_single_mut() else {
+        return;
+    };
+    let Ok((camera_transform, camera)) = camera_query.get_single() else {
+        return;
+    };
+
+    let Ok(window) = window_query.get_single() else {
+        return;
+    };
 
     if let (Some(screen_position), Some(cursor_position)) = (
         camera.world_to_viewport(camera_transform, player_transform.translation),
@@ -129,9 +138,9 @@ pub fn manage_direction(
 pub fn manage_state_machine(
     mut player_query: Query<(&mut StateMachine<AnimationState>, &Velocity), With<Player>>,
 ) {
-    let (mut state_machine, velocity) = player_query.single_mut();
-
-    //info!("{}", velocity.displacement.normalize().length());
+    let Ok((mut state_machine, velocity)) = player_query.get_single_mut() else {
+        return;
+    };
 
     if velocity.displacement.normalize().length() > 0.0 {
         if !state_machine.is_current_state("Run".into()) {

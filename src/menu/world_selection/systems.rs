@@ -1,17 +1,16 @@
-use anyhow::Ok;
 use belly::prelude::*;
-use bevy::{
-    a11y::{accesskit::NodeBuilder, AccessibilityNode},
-    prelude::*,
-};
-use std::fs;
+use bevy::prelude::*;
+use std::{fmt, fs};
 
-use crate::menu::{constants::FONT_SIZE, helpers::Page, resources::MenuManager};
+use crate::{
+    game::world::events::EnterWorld,
+    menu::{events::UpdatePage, helpers::Page, resources::MenuManager},
+};
 
 use super::{
-    components::{WorldSelectionData, WorldSelectionRoot, WorldsContainer},
+    components::{WorldSelectionData, WorldSelectionRoot},
     constants::WORLDS_DIR_PATH,
-    events::SetWorldSelectionRootEvent,
+    events::{StartSelectedWorld, UpdateSelectedWorld},
     resources::WorldSelectionManager,
 };
 
@@ -28,78 +27,125 @@ pub fn spawn_world_selection_ui(mut commands: Commands) {
     commands.add(StyleSheet::load("styles/main.ess"));
     commands.add(StyleSheet::load("styles/world_selection.ess"));
     commands.add(eml! {
-        <body id="world-selection" c:flex-center c:center-panel with=WorldSelectionRoot>
-            <div s:width="100%" s:height="100%" s:background-color="#dddddd" c:flex-center s:flex-direction="row">
-                <div id="worlds-container" s:width="50%" s:height="100%" s:flex-direction="column" s:align-items="start">
-
+        <body id="world-selection" s:flex-direction="column" c:flex-center c:center-panel with=WorldSelectionRoot>
+            <div s:width="100%" s:height="90%" s:background-color="#dddddd" c:flex-center s:flex-direction="row">
+                <div id="worlds-container" s:width="50%" s:height="100%" s:flex-direction="column" s:align-items="start" />
+                <div s:width="50%" s:height="100%" s:flex-direction="column" s:align-items="start" s:padding="10px">
+                    <label bind:value=from!(WorldSelectionManager:get_world_name()) s:color="#000000" />
+                    <button 
+                        on:press=|ctx| {
+                            ctx.send_event(StartSelectedWorld);
+                        }
+                        s:width="70px"
+                    >
+                        "Play"
+                    </button>
                 </div>
-                <div s:width="50%">
-
-                </div>
+            </div>
+            <div s:width="100%" s:height="10%" s:align-items="start">
+                <button>
+                    <label value="Create World" />
+                </button>
+                <button on:press=|ctx| { ctx.send_event(UpdatePage(Page::Main)) }>
+                    <label value="Back" />
+                </button>
             </div>
         </body>
     })
 }
 
 pub(crate) fn populate_worlds(mut elements: Elements, menu_manager: Res<MenuManager>) {
-    if menu_manager.is_changed() {
-        if menu_manager.page != Page::WorldSelection {
-            // Clear worlds
-            for entity in elements.select(".world-child").entities() {
-                elements.entity(entity).remove();
-            }
-            return;
+    if !menu_manager.is_changed() {
+        return;
+    }
+
+    if menu_manager.page != Page::WorldSelection {
+        // Clear worlds
+        for entity in elements.select(".world-child").entities() {
+            elements.entity(entity).remove();
         }
 
-        let worlds = WorldSelectionData::load_all(WORLDS_DIR_PATH);
+        return;
+    }
 
-        if let Err(e) = worlds {
-            elements.select("#worlds-container").add_child(eml! {
-                <label>{e.to_string()}</label>
-            });
+    let worlds = WorldSelectionData::load_all(WORLDS_DIR_PATH);
+    if let Err(e) = worlds {
+        elements.select("#worlds-container").add_child(eml! {
+            <label>{e.to_string()}</label>
+        });
 
-            return;
-        }
+        return;
+    }
 
-        for (name, world) in worlds.unwrap() {
-            elements.select("#worlds-container").add_child(eml! {
-                <button c:world-child s:width="100%" s:height="75px">
-                    <label value={name} />
-                </button>
-            });
-        }
+    for (name, world) in worlds.unwrap() {
+        elements.select("#worlds-container").add_child(eml! {
+            <button
+                c:world-child
+                s:width="100%"
+                s:height="75px"
+                on:press=move |ctx| {ctx.send_event(UpdateSelectedWorld(name.clone(), world.clone()))}
+            >
+                <label value={name.clone()} />
+            </button>
+        });
     }
 }
 
 pub fn world_selection_ui_visibility(mut elements: Elements, menu_manager: Res<MenuManager>) {
-    if menu_manager.is_changed() {
-        match menu_manager.page {
-            Page::WorldSelection => {
-                elements.select("#world-selection").remove_class("hidden");
-            }
-            _ => {
-                elements.select("#world-selection").add_class("hidden");
-            }
+    if !menu_manager.is_changed() {
+        return;
+    }
+
+    match menu_manager.page {
+        Page::WorldSelection => {
+            elements.select("#world-selection").remove_class("hidden");
+        }
+        _ => {
+            elements.select("#world-selection").add_class("hidden");
         }
     }
 }
 
-pub fn current_selected_world_display(
-    button_query: Query<(&WorldSelectionData, &Interaction), Changed<Interaction>>,
+pub fn update_selected_world(
+    mut selected_world_event_reader: EventReader<UpdateSelectedWorld>,
     mut world_selection_manager: ResMut<WorldSelectionManager>,
 ) {
-    for (selected_world, interaction) in button_query.iter() {
-        if matches!(interaction, Interaction::Pressed) {
-            world_selection_manager.selected_world = Some(selected_world.clone());
+    for event in selected_world_event_reader.read() {
+        world_selection_manager.name = Some(event.0.clone());
+        world_selection_manager.selected_world = Some(event.1);
+    }
+}
 
-            info!("{:?}", world_selection_manager.selected_world);
-        }
+pub fn start_selected_world(
+    mut start_world_event_reader: EventReader<StartSelectedWorld>,
+    world_selection_manager: Res<WorldSelectionManager>,
+    mut enter_world_event_writer: EventWriter<EnterWorld>,
+    mut root_query: Query<&mut Style, With<WorldSelectionRoot>>,
+) {
+    for _ in start_world_event_reader.read() {
+        let Some(world) = world_selection_manager.selected_world else {
+            return;
+        };
+
+        let Ok(mut style) = root_query.get_single_mut() else {
+            return;
+        };
+
+        enter_world_event_writer.send(EnterWorld {
+            name: world_selection_manager.get_world_name(),
+            seed: world.seed,
+        });
+        style.display = Display::None;
     }
 }
 
 pub fn cleanup_world_selection_ui(
     mut commands: Commands,
-    root_query: Query<Entity, With<WorldSelectionRoot>>,
+    mut root_query: Query<Entity, With<WorldSelectionRoot>>,
 ) {
-    commands.entity(root_query.single()).despawn();
+    let Ok(entity) = root_query.get_single_mut() else {
+        return;
+    };
+
+    commands.entity(entity).despawn();
 }
