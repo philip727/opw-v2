@@ -1,7 +1,12 @@
-use std::fmt::Debug;
+use super::components::Item;
 
-#[derive(Clone, Debug, bevy_inspector_egui::InspectorOptions)]
-pub struct Item {
-    pub id: u32,
-    pub name: String,
+pub struct ItemData {
+    pub item: Item,
+    pub r#type: ItemType,
+}
+
+pub enum ItemType {
+    Tool,
+    Stackable,
+    Placeable,
 }
