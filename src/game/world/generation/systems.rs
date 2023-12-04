@@ -31,7 +31,6 @@ pub fn create_world_generation_settings(
     mut enter_world_event_reader: EventReader<EnterWorld>,
 ) {
     for event in enter_world_event_reader.read() {
-        info!("Hi");
         world_gen_manager.seed = event.seed;
         world_gen_manager.rng = Some(StdRng::seed_from_u64(world_gen_manager.seed as u64))
     }
@@ -43,8 +42,7 @@ pub fn spawn_chunk(
     mut world_manager: ResMut<WorldManager>,
     mut request_texture_map_event_writer: EventWriter<RequestTextureMap>,
 ) {
-    info!("Main chunk spawned");
-
+    info!("Creating chunk entity");
     let chunk_pos = ThresholdPos { x: 0, y: 0 };
     let chunk_entity = create_chunk_tilemap(&mut commands, &asset_server, &chunk_pos);
     world_manager.chunk_entity = Some(chunk_entity);
@@ -52,6 +50,8 @@ pub fn spawn_chunk(
     request_texture_map_event_writer.send(RequestTextureMap {
         threshold_pos: chunk_pos,
     });
+
+    info!("Created chunk entity");
 }
 
 pub fn update_chunk_pos(
@@ -59,12 +59,14 @@ pub fn update_chunk_pos(
     mut request_texture_map_event_writer: EventWriter<RequestTextureMap>,
     target_query: Query<&Transform, With<ChunkTarget>>,
 ) {
-    let target = target_query.single();
+    let Ok(target) = target_query.get_single() else {
+        return;
+    };
+
     let target_threshold_pos = target.translation.to_threshold_pos();
     if world_gen_manager.last_update_pos == target_threshold_pos {
         return;
     }
-    info!("Request chunk update");
 
     // Moves the chunk to the right position
     world_gen_manager.last_update_pos = target_threshold_pos;
@@ -84,7 +86,7 @@ pub fn request_chunk_texture_map(
     let noise_map_events: Vec<_> = request_texture_map_event_reader.read().cloned().collect();
 
     for event in noise_map_events {
-        info!("Generating new texture map");
+        info!("Generating new chunk texture map");
 
         let thread_pool = AsyncComputeTaskPool::get();
         let threshold_pos = event.threshold_pos.clone();
@@ -152,7 +154,7 @@ pub fn request_chunk_texture_map(
                 &biome_manager,
             );
 
-            info!("Finished texture map");
+            info!("Finished generating new texture map");
             (texture_map, ruletile_map, threshold_pos)
         });
 

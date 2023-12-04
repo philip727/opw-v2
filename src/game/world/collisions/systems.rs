@@ -17,6 +17,7 @@ pub fn handle_collision_update(
     mut tile_query: Query<(&mut TileProperties, &TilePos)>,
 ) {
     for event in request_chunk_rerender_reader.read() {
+        info!("Updating collidable tiles");
         if let None = world_manager.chunk_entity {
             continue;
         }
@@ -37,6 +38,6 @@ pub fn handle_collision_update(
             }
         }
 
-        info!("Finished collision update");
+        info!("Finished updating collidable tiles");
     }
 }

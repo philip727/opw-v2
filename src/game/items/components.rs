@@ -1,17 +1,22 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::InspectorOptions;
+use serde::{Deserialize, Serialize};
 
-#[derive(Component, Clone, Debug, InspectorOptions)]
+use super::helpers::BaseItem;
+
+#[derive(Component, InspectorOptions, Reflect, Default, Clone, Debug, Serialize, Deserialize)]
+#[reflect(Component)]
 pub struct Item {
-    pub id: u32,
+    pub id: String,
     pub name: String,
 }
 
-#[derive(Component)]
-pub struct Stackable;
+impl BaseItem for Item {
+    fn id(&self) -> &str {
+        &self.id
+    }
 
-#[derive(Component)]
-pub struct Placeable;
-
-#[derive(Component)]
-pub struct Tool;
+    fn name(&self) -> &str {
+        &self.name
+    }
+}

@@ -1,4 +1,6 @@
-use bevy::prelude::Entity;
+use bevy::prelude::*;
+
+use crate::game::items::{components::Item, helpers::BaseItem};
 
 pub trait ItemSlot {
     fn amount(&self) -> u32;
@@ -24,5 +26,19 @@ pub trait ItemSlot {
     fn update_slot(&mut self, item: Option<Entity>, amount: u32) {
         self.set_item(item);
         self.set_amount(amount);
+    }
+
+    fn has_item(&self, item: &(impl Component + BaseItem), item_query: &Query<&Item>) -> bool {
+        if let Some(entity) = self.item() {
+            let Ok(found_item) = item_query.get(*entity) else {
+                return false;
+            };
+
+            if item.id() == found_item.id {
+                return true;
+            }
+        }
+
+        false
     }
 }

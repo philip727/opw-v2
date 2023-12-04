@@ -1,0 +1,20 @@
+[
+	{
+		"properties": [
+			"Tool"
+		],
+		"data": {
+			"id": "item:common:tool:wooden_axe",
+			"name": "Wooden Axe"
+		}
+	},
+	{
+		"properties": [
+			"Stackable"
+		],
+		"data": {
+			"id": "item:common:material:wooden_log",
+			"name": "Wooden Log"
+		}
+	}
+]

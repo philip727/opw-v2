@@ -14,8 +14,8 @@ use crate::{
             generation::{
                 components::{Chunk, ChunkTarget},
                 constants::TILE_SIZE,
-            },
-        },
+            }, states::WorldState,
+        }, inventory::components::Inventory,
     },
 };
 
@@ -29,6 +29,7 @@ pub fn spawn_player(
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
+    info!("Creating player entity");
     let entity_skin = EntitySkin::load_from_path("./data/skins/default".into()).unwrap();
     let texture_atlas = entity_skin.generate_texture_atlas(&asset_server);
     let animation_state: StateMachine<AnimationState> = entity_skin.into();
@@ -47,9 +48,14 @@ pub fn spawn_player(
         MovementController::default(),
         DirectionController,
         ChunkTarget,
+        Inventory::new(20),
         CameraTarget { priority: 1 },
         Velocity::new(Vec3::new(0.0, 0.0, PLAYER_POS_Z)),
     ));
+
+
+    info!("Player entity created");
+    commands.insert_resource(NextState(Some(WorldState::Created)));
 }
 
 pub fn manage_movement(

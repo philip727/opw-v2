@@ -1,16 +1,63 @@
-use bevy::{utils::HashMap, prelude::*};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
-use super::helpers::ItemData;
+use bevy::{prelude::*, utils::HashMap};
+use bevy_inspector_egui::InspectorOptions;
+
+use super::{
+    components::Item,
+    errors::ItemError,
+    helpers::ItemData,
+};
 
 pub type ItemId = u32;
-#[derive(Resource, Default)]
+#[derive(Resource, Reflect, InspectorOptions)]
+#[reflect(Resource)]
 pub struct ItemDatabase {
-    pub items: HashMap<ItemId, ItemData>
+    pub items: HashMap<String, ItemData>,
+}
+
+impl Default for ItemDatabase {
+    fn default() -> Self {
+        let items = HashMap::new();
+        ItemDatabase { items }
+    }
 }
 
 impl ItemDatabase {
     // Load all items
-    pub fn initialize(&mut self) {
-        todo!()
+    pub fn initialize(&mut self, path: PathBuf) {
+        let items = ItemDatabase::load_items(path);
+
+        for item in items.unwrap() {
+            self.items.insert(item.data.id.clone(), item);
+        }
+    }
+
+    pub fn get_item_data(&self, item: &Item) -> Option<&ItemData> {
+        self.items.get(&item.id)
+    }
+
+    pub fn get_item_data_by_id(&self, id: &str) -> Option<&ItemData> {
+        self.items.get(id)
+    }
+
+    pub fn load_items(path: PathBuf) -> anyhow::Result<Vec<ItemData>> {
+        let json_path = path.to_str().unwrap().to_owned();
+        let file_string = fs::read_to_string(&path).map_err(|_| ItemError::NoItemJson {
+            path: json_path.clone(),
+        })?;
+
+        let items: Vec<ItemData> =
+            serde_json::from_str::<Vec<ItemData>>(&file_string).map_err(|e| {
+                ItemError::InvalidData {
+                    path: json_path.clone(),
+                    error: e.to_string(),
+                }
+            })?;
+
+        Ok(items)
     }
 }

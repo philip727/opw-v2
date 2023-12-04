@@ -13,10 +13,11 @@ use crate::game::world::{
 use crate::math::map::ValueMap2D;
 
 pub fn pack_textures(biome_manager: Res<BiomeManager>, mut commands: Commands) {
+    info!("Generating new texture atlas");
     generate_texture_atlas(&biome_manager.loaded);
 
-    info!("Texture atlas created");
-    commands.insert_resource(NextState(Some(WorldState::Created)));
+    info!("New texture atlas created");
+    commands.insert_resource(NextState(Some(WorldState::LoadItems)));
 }
 
 pub fn handle_chunk_rerender(

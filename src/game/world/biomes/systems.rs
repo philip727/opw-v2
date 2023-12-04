@@ -8,7 +8,7 @@ use image::io::Reader as ImageReader;
 use super::resources::BiomeManager;
 
 pub fn setup_biome_data(mut biome_manager: ResMut<BiomeManager>, mut commands: Commands) {
-    info!("Biome data loaded");
+    info!("Loading default biomes");
     let tile_size_u32 = TILE_SIZE as u32;
     let biome_data = BiomeData::load_all(BIOMES_DIR_PATH).unwrap();
 
@@ -26,5 +26,6 @@ pub fn setup_biome_data(mut biome_manager: ResMut<BiomeManager>, mut commands: C
     }
 
     biome_manager.loaded = biome_data;
+    info!("Loaded default biomes");
     commands.insert_resource(NextState(Some(WorldState::GenerateTextureAtlas)));
 }

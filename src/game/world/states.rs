@@ -6,5 +6,7 @@ pub enum WorldState {
     Initial,
     LoadBiomes,
     GenerateTextureAtlas,
+    LoadItems,
+    LoadPlayer,
     Created,
 }

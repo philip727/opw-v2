@@ -5,7 +5,7 @@ use self::{
     camera::CameraPlugin,
     common::{animation::AnimationPlugin, velocity::VelocityPlugin},
     player::PlayerPlugins,
-    world::WorldPlugins,
+    world::WorldPlugins, inventory::InventoryPlugin, items::ItemPlugin,
 };
 
 pub mod camera;
@@ -24,6 +24,8 @@ impl PluginGroup for GamePlugins {
         group = group
             .add(TilemapPlugin)
             .add(CameraPlugin)
+            .add(InventoryPlugin)
+            .add(ItemPlugin)
             .add(PlayerPlugins)
             .add(WorldPlugins)
             .add(AnimationPlugin)
