@@ -5,12 +5,12 @@ use serde::{Serialize, Deserialize};
 use super::components::Item;
 
 #[derive(Serialize, Deserialize, Debug, InspectorOptions, Reflect, Default)]
-pub struct ItemData {
+pub struct ItemRecord {
     pub data: Item,
     pub properties: Vec<ItemProperties>,
 }
 
-impl ItemData {
+impl ItemRecord {
     pub fn is_tool(&self) -> bool {
         self.properties.contains(&ItemProperties::Tool)
     }

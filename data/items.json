@@ -16,5 +16,14 @@
 			"id": "item:common:material:wooden_log",
 			"name": "Wooden Log"
 		}
+	},
+	{
+		"properties": [
+			"Stackable"
+		],
+		"data": {
+			"id": "item:common:material:stone",
+			"name": "Stone"
+		}
 	}
 ]

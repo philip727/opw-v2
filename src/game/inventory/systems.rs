@@ -32,32 +32,12 @@ pub fn test_inputs(
         return;
     };
 
-    if keyboard_input.pressed(KeyCode::J) {
-        let Some(item_data) = item_database.get_item_data_by_id("hi") else {
-            info!("Failed to find item");
-            return;
-        };
-
-        inventory.add_item(
-            &mut commands,
-            item_data,
-            &mut slot_query,
-            &item_query,
-            1,
-        );
-    }
-
     if keyboard_input.pressed(KeyCode::K) {
-        let Some(item_data) = item_database.get_item_data_by_id("item:common:material:wooden_log") else {
+        let Some(item_data) = item_database.get_item_data_by_id("item:common:material:wooden_log")
+        else {
             return;
         };
 
-        inventory.add_item(
-            &mut commands,
-            item_data,
-            &mut slot_query,
-            &item_query,
-            1,
-        );
+        inventory.add_item(&mut commands, item_data, &mut slot_query, &item_query, 1);
     }
 }

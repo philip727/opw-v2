@@ -4,7 +4,7 @@ use bevy_inspector_egui::prelude::*;
 
 use crate::game::items::{
     components::Item,
-    helpers::{BaseItem, ItemData},
+    helpers::{BaseItem, ItemRecord},
 };
 
 use super::helpers::ItemSlot;
@@ -87,7 +87,7 @@ impl Inventory {
     pub fn add_item(
         &mut self,
         commands: &mut Commands,
-        item_data: &ItemData,
+        item_data: &ItemRecord,
         slot_query: &mut Query<&mut InventorySlot>,
         item_query: &Query<&Item>,
         amount: u32,
