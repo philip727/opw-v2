@@ -122,7 +122,7 @@ impl Inventory {
     }
 }
 
-#[derive(Component, InspectorOptions, Reflect, Default)]
+#[derive(Component, InspectorOptions, Reflect, Default, Debug)]
 #[reflect(Component)]
 pub struct InventorySlot {
     pub item: Option<ItemEntity>,
