@@ -147,5 +147,5 @@ pub fn cleanup_world_selection_ui(
         return;
     };
 
-    commands.entity(entity).despawn();
+    commands.entity(entity).despawn_recursive();
 }

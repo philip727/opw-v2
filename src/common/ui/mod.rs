@@ -3,6 +3,7 @@ pub mod bundles;
 pub mod components;
 pub mod constants;
 pub mod systems;
+pub mod macros;
 
 use bevy::prelude::*;
 

@@ -47,5 +47,5 @@ pub fn cleanup_menu_ui(mut commands: Commands, root_query: Query<Entity, With<Me
         return;
     };
 
-    commands.entity(entity).despawn();
+    commands.entity(entity).despawn_recursive();
 }

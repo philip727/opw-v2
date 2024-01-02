@@ -2,6 +2,8 @@ use bevy::prelude::*;
 
 use crate::game::items::{components::Item, helpers::BaseItem};
 
+pub type InventoryEntity = Entity;
+
 pub trait ItemSlot {
     fn amount(&self) -> u32;
 
