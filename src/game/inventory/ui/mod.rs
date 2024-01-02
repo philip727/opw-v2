@@ -5,7 +5,10 @@ use crate::{game::world::states::WorldState, states::AppState};
 use self::{
     events::CreateInventoryUI,
     resources::InventoryUIManager,
-    systems::{create_inventories_root_ui, open_inventory, toggle_inventory_uis, cleanup_inventories_root_ui},
+    systems::{
+        cleanup_inventories_root_ui, create_inventories_root_ui, open_inventory,
+        toggle_inventory_uis,
+    },
 };
 
 pub mod events;

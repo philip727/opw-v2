@@ -36,7 +36,7 @@ fn main() {
                         resizable: true,
                         present_mode: PresentMode::Immediate,
                         window_level: WindowLevel::Normal,
-                        resolution: WindowResolution::new(1920.0, 1080.0),
+                        resolution: WindowResolution::new(1280.0, 720.0),
                         ..Default::default()
                     }),
                     ..Default::default()

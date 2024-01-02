@@ -14,7 +14,7 @@ pub fn create_inventories_root_ui(
     mut commands: Commands,
     mut inventory_ui_manager: ResMut<InventoryUIManager>,
 ) {
-    create_ui!(Grid->root);
+    create_ui!(GridCenter->root);
     root.style = Style {
         width: Val::Percent(100.),
         height: Val::Percent(100.),
@@ -30,7 +30,9 @@ pub fn cleanup_inventories_root_ui(
     mut commands: Commands,
     inventory_ui_manager: Res<InventoryUIManager>,
 ) {
-    commands.entity(inventory_ui_manager.root()).despawn_recursive();
+    commands
+        .entity(inventory_ui_manager.root())
+        .despawn_recursive();
 }
 
 pub fn toggle_inventory_uis(
@@ -58,12 +60,10 @@ pub fn toggle_inventory_uis(
         }
 
         // Creates the background
-        create_ui!(Grid->inventory_node);
+        create_ui!(Node->inventory_node);
         inventory_node.style = Style {
             width: Val::Percent(92.),
             height: Val::Percent(92.),
-            grid_template_columns: vec![GridTrack::auto()],
-            grid_template_rows: vec![GridTrack::auto()],
             ..inventory_node.style
         };
         inventory_node.background_color = BackgroundColor(Color::WHITE);
@@ -74,6 +74,20 @@ pub fn toggle_inventory_uis(
             .entity(inventory_ui_manager.root())
             .push_children(&[inventory_ui_entity]);
         inventory_ui_manager.add_inventory(inventory_entity, inventory_ui_entity);
+
+        create_ui!(Node->slot_holder_node);
+        slot_holder_node.style = Style {
+            flex_wrap: FlexWrap::Wrap,
+            align_items: AlignItems::Start,
+            justify_items: JustifyItems::Start,
+            width: Val::Percent(100.),
+            ..slot_holder_node.style
+        };
+
+        let slot_holder_entity = commands.spawn(slot_holder_node).id();
+        commands
+            .entity(inventory_ui_entity)
+            .push_children(&[slot_holder_entity]);
 
         // Creates the inventory slots that belong to the parent ui entity
         for slot in slots.iter() {
@@ -92,7 +106,7 @@ pub fn toggle_inventory_uis(
 
             let slot_ui_entity = commands.spawn(slot_node).id();
             commands
-                .entity(inventory_ui_entity)
+                .entity(slot_holder_entity)
                 .push_children(&[slot_ui_entity]);
 
             info!("{:?}", slot);

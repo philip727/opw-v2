@@ -12,10 +12,31 @@ macro_rules! create_ui {
             ..Default::default()
         };
     };
+    (NodeCenter->$name:ident) => {
+        let mut $name = NodeBundle {
+            style: Style {
+                justify_items: JustifyItems::Center,
+                align_items: AlignItems::Center,
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+    };
     (Grid->$name:ident) => {
         let mut $name = NodeBundle {
             style: Style {
                 display: Display::Grid,
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+    };
+    (GridCenter->$name:ident) => {
+        let mut $name = NodeBundle {
+            style: Style {
+                display: Display::Grid,
+                justify_items: JustifyItems::Center,
+                align_items: AlignItems::Center,
                 ..Default::default()
             },
             ..Default::default()
