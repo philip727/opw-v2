@@ -17,7 +17,7 @@ pub struct InventoryUIManager {
 
 impl InventoryUIManager {
     /// Adds a reference to the inventory entity in the UI manager
-    pub fn add_inventory(
+    pub fn create_inventory_ui(
         &mut self,
         inventory_entity: InventoryEntity,
         ui_entity: UIInventoryEntity,
@@ -31,7 +31,7 @@ impl InventoryUIManager {
     }
 
     /// Removes all references in the UI manager to that inventory entity
-    pub fn destroy_inventory(&mut self, inventory_entity: &InventoryEntity) {
+    pub fn destroy_inventory_ui(&mut self, inventory_entity: &InventoryEntity) {
         self.open_inventories.retain(|&x| x != *inventory_entity);
         let ui_inventory_entity = self
             .inventory_entity_to_ui_entity
@@ -48,7 +48,7 @@ impl InventoryUIManager {
         self.inventory_parent.unwrap()
     }
 
-    pub fn is_inventory_open(&self, inventory_entity: &InventoryEntity) -> bool {
+    pub fn inventory_has_ui(&self, inventory_entity: &InventoryEntity) -> bool {
         self.open_inventories.contains(inventory_entity)
     }
 

@@ -56,14 +56,15 @@ pub fn toggle_inventory_ui(
             continue;
         };
 
-        // Despawns the inventory ui slots corresponding to the inventory entity passed in
-        if inventory_ui_manager.is_inventory_open(&inventory_entity) {
+        // Despawns the inventory ui corresponding to the inventory passed in
+        if inventory_ui_manager.inventory_has_ui(&inventory_entity) {
+            // Gets the inventory ui entity according to the inventory
             let inventory_ui_entity = inventory_ui_manager
                 .inventory_to_ui(&inventory_entity)
                 .unwrap();
 
             commands.entity(*inventory_ui_entity).despawn_recursive();
-            inventory_ui_manager.destroy_inventory(&inventory_entity);
+            inventory_ui_manager.destroy_inventory_ui(&inventory_entity);
             continue;
         }
 
@@ -85,8 +86,8 @@ pub fn toggle_inventory_ui(
             .entity(event.ui_inventory_parent)
             .push_children(&[slot_holder_entity]);
 
-        // Adds the inventory to the inventory manager so we already know if its open or not
-        inventory_ui_manager.add_inventory(inventory_entity, slot_holder_entity);
+        // Creates the inventory so we can know if it is already open or not
+        inventory_ui_manager.create_inventory_ui(inventory_entity, slot_holder_entity);
 
         // Creates the ui slot for each slot in the inventory
         for slot in slots.iter() {
@@ -94,7 +95,6 @@ pub fn toggle_inventory_ui(
                 continue;
             };
 
-            // Creates the button node for the slot
             create_ui!(Btn->slot_node);
             slot_node.style = Style {
                 width: Val::Px(128.),
@@ -139,7 +139,7 @@ pub fn update_inventory_ui(
 ) {
     for (inv_entity, slots) in inventory_query.iter() {
         // Makes sure that inventory is actually open on the screen
-        if !inventory_ui_manager.is_inventory_open(&inv_entity) {
+        if !inventory_ui_manager.inventory_has_ui(&inv_entity) {
             continue;
         }
 
@@ -154,6 +154,7 @@ pub fn update_inventory_ui(
                 continue;
             };
 
+            // If we have an item in that slot, then we must update that slot
             if let Some(item) = slot.item {
                 let Ok(item) = item_query.get(item) else {
                     continue;
@@ -168,6 +169,7 @@ pub fn update_inventory_ui(
                 continue;
             }
 
+            // If we don't have an item in that slot then we do not display it
             *bg_color = BackgroundColor(Color::BLACK);
         }
     }
