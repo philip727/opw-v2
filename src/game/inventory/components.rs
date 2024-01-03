@@ -7,7 +7,7 @@ use crate::game::items::{
     helpers::{BaseItem, ItemRecord},
 };
 
-use super::helpers::ItemSlot;
+use super::{helpers::ItemSlot, ui::helpers::UISlotEntity};
 
 pub type ItemEntity = Entity;
 pub type SlotEntity = Entity;
@@ -37,6 +37,7 @@ impl Inventory {
                     InventorySlot {
                         item: None,
                         amount: 0,
+                        ui_slot: None,
                     },
                 ))
                 .id();
@@ -120,6 +121,37 @@ impl Inventory {
             return;
         }
     }
+
+    pub fn remove_item(
+        &mut self,
+        commands: &mut Commands,
+        item_data: &ItemRecord,
+        slot_query: &mut Query<&mut InventorySlot>,
+        item_query: &Query<&Item>,
+        amount: u32,
+    ) {
+        let item = item_data.data.clone();
+        // Finds the first instance of that item in the inventory
+        if let Some(slot_entity) = self.find_slot_with_item(&item, slot_query, item_query) {
+            let Ok(mut slot) = slot_query.get_mut(slot_entity) else {
+                return;
+            };
+
+            // Checks if the new amount is below 0, if it is then we set the slot to nothing
+            let new_amount = slot.amount as i32 - amount as i32;
+            if new_amount <= 0 {
+                let item_entity = slot.item().unwrap();
+                slot.set_item(None);
+                slot.set_amount(0);
+
+                commands.entity(item_entity).despawn();
+                return;
+            }
+
+            // Otherwise, we remove the amount
+            slot.remove_amount(amount);
+        }
+    }
 }
 
 #[derive(Component, InspectorOptions, Reflect, Default, Debug)]
@@ -127,6 +159,7 @@ impl Inventory {
 pub struct InventorySlot {
     pub item: Option<ItemEntity>,
     pub amount: u32,
+    pub ui_slot: Option<UISlotEntity>,
 }
 
 impl ItemSlot for InventorySlot {

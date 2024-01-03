@@ -32,12 +32,21 @@ pub fn test_inputs(
         return;
     };
 
-    if keyboard_input.pressed(KeyCode::K) {
+    if keyboard_input.just_pressed(KeyCode::J) {
         let Some(item_data) = item_database.get_item_data_by_id("item:common:material:wooden_log")
         else {
             return;
         };
 
         inventory.add_item(&mut commands, item_data, &mut slot_query, &item_query, 1);
+    }
+
+    if keyboard_input.just_pressed(KeyCode::K) {
+        let Some(item_data) = item_database.get_item_data_by_id("item:common:material:wooden_log")
+        else {
+            return;
+        };
+
+        inventory.remove_item(&mut commands, item_data, &mut slot_query, &item_query, 1);
     }
 }

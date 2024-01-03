@@ -2,14 +2,15 @@ use bevy::prelude::*;
 use bevy::reflect::List;
 use bevy::utils::{EntityHashMap, HashMap};
 
+use crate::game::inventory::components::SlotEntity;
 use crate::game::inventory::helpers::InventoryEntity;
 
-use super::helpers::InventoryUIEntity;
+use super::helpers::{UIInventoryEntity, UISlotEntity};
 
 #[derive(Resource, Default)]
 pub struct InventoryUIManager {
-    pub ui_entity_to_inventory_entity: EntityHashMap<InventoryUIEntity, InventoryEntity>,
-    pub inventory_entity_to_ui_entity: EntityHashMap<InventoryEntity, InventoryUIEntity>,
+    pub ui_entity_to_inventory_entity: EntityHashMap<UIInventoryEntity, InventoryEntity>,
+    pub inventory_entity_to_ui_entity: EntityHashMap<InventoryEntity, UIInventoryEntity>,
     pub open_inventories: Vec<InventoryEntity>,
     pub inventory_parent: Option<Entity>,
 }
@@ -19,7 +20,7 @@ impl InventoryUIManager {
     pub fn add_inventory(
         &mut self,
         inventory_entity: InventoryEntity,
-        ui_entity: InventoryUIEntity,
+        ui_entity: UIInventoryEntity,
     ) {
         self.open_inventories.push(inventory_entity);
 
@@ -51,11 +52,11 @@ impl InventoryUIManager {
         self.open_inventories.contains(inventory_entity)
     }
 
-    pub fn ui_to_inventory(&self, ui_entity: &InventoryUIEntity) -> Option<&InventoryEntity> {
+    pub fn ui_to_inventory(&self, ui_entity: &UIInventoryEntity) -> Option<&InventoryEntity> {
         self.ui_entity_to_inventory_entity.get(ui_entity)
     }
 
-    pub fn inventory_to_ui(&self, inv_entity: &InventoryEntity) -> Option<&InventoryUIEntity> {
+    pub fn inventory_to_ui(&self, inv_entity: &InventoryEntity) -> Option<&UIInventoryEntity> {
         self.inventory_entity_to_ui_entity.get(inv_entity)
     }
 }

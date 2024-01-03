@@ -1,12 +1,13 @@
-use bevy::reflect::Reflect;
+use bevy::{asset::Handle, reflect::Reflect, render::texture::Image};
 use bevy_inspector_egui::InspectorOptions;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use super::components::Item;
 
 #[derive(Serialize, Deserialize, Debug, InspectorOptions, Reflect, Default)]
 pub struct ItemRecord {
     pub data: Item,
+    pub asset: String,
     pub properties: Vec<ItemProperties>,
 }
 

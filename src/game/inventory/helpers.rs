@@ -17,6 +17,10 @@ pub trait ItemSlot {
         self.update_slot(*self.item(), self.amount() + amount);
     }
 
+    fn remove_amount(&mut self, amount: u32) {
+        self.update_slot(*self.item(), self.amount() - amount);
+    }
+
     fn item(&self) -> &Option<Entity>;
 
     fn mut_item(&mut self) -> &mut Option<Entity>;

@@ -3,6 +3,7 @@
 		"properties": [
 			"Tool"
 		],
+		"asset": "items/wooden-log.png",
 		"data": {
 			"id": "item:common:tool:wooden_axe",
 			"name": "Wooden Axe"
@@ -12,6 +13,7 @@
 		"properties": [
 			"Stackable"
 		],
+		"asset": "items/wooden-log.png",
 		"data": {
 			"id": "item:common:material:wooden_log",
 			"name": "Wooden Log"
@@ -21,6 +23,7 @@
 		"properties": [
 			"Stackable"
 		],
+		"asset": "items/wooden-log.png",
 		"data": {
 			"id": "item:common:material:stone",
 			"name": "Stone"

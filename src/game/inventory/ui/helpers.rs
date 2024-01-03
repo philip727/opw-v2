@@ -1,3 +1,4 @@
 use bevy::prelude::*;
 
-pub type InventoryUIEntity = Entity;
+pub type UIInventoryEntity = Entity;
+pub type UISlotEntity = Entity;

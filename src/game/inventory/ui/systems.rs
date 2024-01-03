@@ -3,12 +3,16 @@ use bevy::prelude::*;
 use crate::{
     create_ui,
     game::{
-        inventory::components::{Inventory, InventorySlot},
+        inventory::{
+            components::{Inventory, InventorySlot},
+            ui::components::UIInventorySlot,
+        },
+        items::{components::Item, resources::ItemDatabase},
         player::components::Player,
     },
 };
 
-use super::{events::CreateInventoryUI, resources::InventoryUIManager};
+use super::{events::CreateInventoryUI, resources::InventoryUIManager, components};
 
 pub fn create_inventories_root_ui(
     mut commands: Commands,
@@ -35,12 +39,16 @@ pub fn cleanup_inventories_root_ui(
         .despawn_recursive();
 }
 
-pub fn toggle_inventory_uis(
+// Takes in an inventory entity, and either creates or destorys the ui corresponding to it
+pub fn toggle_inventory_ui(
     mut commands: Commands,
     mut create_inventory_reader: EventReader<CreateInventoryUI>,
     inventory_query: Query<&Children, With<Inventory>>,
-    slot_query: Query<&InventorySlot>,
+    mut slot_query: Query<&mut InventorySlot>,
+    item_query: Query<&Item>,
     mut inventory_ui_manager: ResMut<InventoryUIManager>,
+    asset_server: Res<AssetServer>,
+    item_database: Res<ItemDatabase>,
 ) {
     for event in create_inventory_reader.read() {
         let inventory_entity = event.inventory_entity;
@@ -48,7 +56,7 @@ pub fn toggle_inventory_uis(
             continue;
         };
 
-        // Despawns the inventory ui if it is open already
+        // Despawns the inventory ui slots corresponding to the inventory entity passed in
         if inventory_ui_manager.is_inventory_open(&inventory_entity) {
             let inventory_ui_entity = inventory_ui_manager
                 .inventory_to_ui(&inventory_entity)
@@ -59,43 +67,34 @@ pub fn toggle_inventory_uis(
             continue;
         }
 
-        // Creates the background
-        create_ui!(Node->inventory_node);
-        inventory_node.style = Style {
-            width: Val::Percent(92.),
-            height: Val::Percent(92.),
-            ..inventory_node.style
-        };
-        inventory_node.background_color = BackgroundColor(Color::WHITE);
-
-        // Adds the inventory ui to the inventory root display and creates references
-        let inventory_ui_entity = commands.spawn(inventory_node).id();
-        commands
-            .entity(inventory_ui_manager.root())
-            .push_children(&[inventory_ui_entity]);
-        inventory_ui_manager.add_inventory(inventory_entity, inventory_ui_entity);
-
+        // Creates the inventory ui slots holder
         create_ui!(Node->slot_holder_node);
         slot_holder_node.style = Style {
             flex_wrap: FlexWrap::Wrap,
             align_items: AlignItems::Start,
-            justify_items: JustifyItems::Start,
+            justify_content: JustifyContent::Start,
             width: Val::Percent(100.),
+            row_gap: Val::Px(15.0),
+            column_gap: Val::Px(15.0),
+            height: Val::Auto,
             ..slot_holder_node.style
         };
 
         let slot_holder_entity = commands.spawn(slot_holder_node).id();
         commands
-            .entity(inventory_ui_entity)
+            .entity(event.ui_inventory_parent)
             .push_children(&[slot_holder_entity]);
 
-        // Creates the inventory slots that belong to the parent ui entity
+        // Adds the inventory to the inventory manager so we already know if its open or not
+        inventory_ui_manager.add_inventory(inventory_entity, slot_holder_entity);
+
+        // Creates the ui slot for each slot in the inventory
         for slot in slots.iter() {
-            let Ok(slot) = slot_query.get(*slot) else {
+            let Ok(mut slot) = slot_query.get_mut(*slot) else {
                 continue;
             };
 
-            // Creates slot node
+            // Creates the button node for the slot
             create_ui!(Btn->slot_node);
             slot_node.style = Style {
                 width: Val::Px(128.),
@@ -104,12 +103,72 @@ pub fn toggle_inventory_uis(
             };
             slot_node.background_color = BackgroundColor(Color::BLACK);
 
-            let slot_ui_entity = commands.spawn(slot_node).id();
+            // If we have an item in that slot, then we must display it
+            if let Some(item) = slot.item {
+                let Ok(item) = item_query.get(item) else {
+                    continue;
+                };
+
+                let Some(item_data) = item_database.get_item_data(item) else {
+                    continue;
+                };
+
+                slot_node.background_color = BackgroundColor(Color::WHITE);
+                slot_node.image = UiImage::new(asset_server.load(item_data.asset.clone()));
+            }
+
+            let slot_ui_entity = commands.spawn((slot_node, UIInventorySlot)).id();
             commands
                 .entity(slot_holder_entity)
                 .push_children(&[slot_ui_entity]);
 
-            info!("{:?}", slot);
+            // This is so we can change the ui slot image according to the item in that slot
+            slot.ui_slot = Some(slot_ui_entity);
+        }
+    }
+}
+
+pub fn update_inventory_ui(
+    inventory_query: Query<(Entity, &Children), With<Inventory>>,
+    slot_query: Query<&InventorySlot, Changed<InventorySlot>>,
+    item_query: Query<&Item>,
+    inventory_ui_manager: Res<InventoryUIManager>,
+    mut ui_slot_query: Query<(&mut UiImage, &mut BackgroundColor), With<UIInventorySlot>>,
+    item_database: Res<ItemDatabase>,
+    asset_server: Res<AssetServer>,
+) {
+    for (inv_entity, slots) in inventory_query.iter() {
+        // Makes sure that inventory is actually open on the screen
+        if !inventory_ui_manager.is_inventory_open(&inv_entity) {
+            continue;
+        }
+
+        for slot in slots.iter() {
+            let Ok(slot) = slot_query.get(*slot) else {
+                continue;
+            };
+
+            // If we can find that slot open on the screen then we get the image and color
+            let Ok((mut image, mut bg_color)) = ui_slot_query.get_mut(slot.ui_slot.unwrap())
+            else {
+                continue;
+            };
+
+            if let Some(item) = slot.item {
+                let Ok(item) = item_query.get(item) else {
+                    continue;
+                };
+
+                let Some(item_data) = item_database.get_item_data(item) else {
+                    continue;
+                };
+
+                *image = UiImage::new(asset_server.load(item_data.asset.clone()));
+                *bg_color = BackgroundColor(Color::WHITE);
+                continue;
+            }
+
+            *bg_color = BackgroundColor(Color::BLACK);
         }
     }
 }
@@ -118,12 +177,15 @@ pub fn open_inventory(
     keyboard_input: Res<Input<KeyCode>>,
     mut create_inventory_ui_writer: EventWriter<CreateInventoryUI>,
     inventory_query: Query<(Entity, &Inventory), With<Player>>,
+    inventory_ui_manager: Res<InventoryUIManager>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Tab) {
         let entity = inventory_query.single().0;
 
+        info!("Tab");
         create_inventory_ui_writer.send(CreateInventoryUI {
             inventory_entity: entity,
+            ui_inventory_parent: inventory_ui_manager.root(),
         })
     }
 }

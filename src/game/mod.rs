@@ -16,6 +16,7 @@ pub mod inventory;
 pub mod items;
 pub mod player;
 pub mod world;
+pub mod backpack;
 
 pub struct GamePlugins;
 

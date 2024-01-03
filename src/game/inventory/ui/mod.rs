@@ -7,7 +7,7 @@ use self::{
     resources::InventoryUIManager,
     systems::{
         cleanup_inventories_root_ui, create_inventories_root_ui, open_inventory,
-        toggle_inventory_uis,
+        toggle_inventory_ui, update_inventory_ui,
     },
 };
 
@@ -15,6 +15,7 @@ pub mod events;
 pub mod helpers;
 pub mod resources;
 pub mod systems;
+pub mod components;
 
 pub struct InventoryUIPlugin;
 
@@ -26,7 +27,7 @@ impl Plugin for InventoryUIPlugin {
             .add_systems(OnExit(AppState::InGame), cleanup_inventories_root_ui)
             .add_systems(
                 Update,
-                (toggle_inventory_uis, open_inventory).run_if(in_state(WorldState::Created)),
+                (toggle_inventory_ui, open_inventory, update_inventory_ui).run_if(in_state(WorldState::Created)),
             );
     }
 }
